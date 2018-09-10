@@ -5,3 +5,7 @@ Designing and implementing an EA to maximise three continuous optimisation probl
 ### Schedule
 #### Monday 10-9-18
 Set up Github and initialised Java Code.
+
+Section
+Initialised the population (randomly)
+Ideas about how to implement "Survival of the Fittest"
