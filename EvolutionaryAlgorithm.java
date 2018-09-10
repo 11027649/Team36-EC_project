@@ -10,7 +10,6 @@
 public class EvolutionaryAlgorithm {
   public static void main(String[] args) {
 
-    // TODO: Create an initial population
     System.out.println("Initializing population....");
 
     // Until "done"
