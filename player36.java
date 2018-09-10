@@ -3,6 +3,7 @@ import org.vu.contest.ContestEvaluation;
 
 import java.util.Random;
 import java.util.Properties;
+import java.util.Arrays;
 
 public class player36 implements ContestSubmission
 {
@@ -23,7 +24,7 @@ public class player36 implements ContestSubmission
 
 	public void setEvaluation(ContestEvaluation evaluation)
 	{
-			// Set evaluation problem used in the run
+		// Set evaluation problem used in the run
 			evaluation_ = evaluation;
 
 			// Get evaluation properties
@@ -48,22 +49,42 @@ public class player36 implements ContestSubmission
 	public void run()
 	{
 		// Run your algorithm here
+				double child[] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+
+				// define population size
+				int pop_size = 100;
+
+				// initialize population randomly
+				for (int i = 0; i < 100; i++) {
+
+						for (int j = 0; j < 10; j++) {
+							int min = -5;
+							int max = 5;
+							double random_double = (Math.random() * (max - min)) + min;
+
+							// TODO: remember population
+							child[j] = random_double;
+
+						}
+
+						System.out.println(Arrays.toString(child));
+				}
 
         int evals = 0;
-        // init population
 
         // calculate fitness
-        while(evals<evaluations_limit_){
-            // Select parents
+        while(evals<evaluations_limit_) {
 
-						// Apply crossover / mutation operators
-            double child[] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+					// Select parents
 
-						// Check fitness of unknown fuction
-            Double fitness = (double) evaluation_.evaluate(child);
-            evals++;
+					// Apply crossover / mutation operators
 
-						// Select survivors
+					// Check fitness of unknown fuction: determines your grade
+					// needs real-value values but conversions before are okay
+					Double fitness = (double) evaluation_.evaluate(child);
+					evals++;
+
+					// Select survivors
 
         }
 
