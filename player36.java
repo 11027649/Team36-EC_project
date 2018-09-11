@@ -4,6 +4,8 @@ import org.vu.contest.ContestEvaluation;
 import java.util.Random;
 import java.util.Properties;
 import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class player36 implements ContestSubmission
 {
@@ -46,47 +48,58 @@ public class player36 implements ContestSubmission
 	    }
     }
 
-	public void run()
-	{
+	public void run() {
 		// Run your algorithm here
-				double child[] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
 
-				// define population size
-				int pop_size = 100;
+		int evals = 0;
+		double childrens[][] = create_population();
 
-				// initialize population randomly
-				for (int i = 0; i < 100; i++) {
+		// calculate fitness
+		while (evals < evaluations_limit_) {
 
-						for (int j = 0; j < 10; j++) {
-							int min = -5;
-							int max = 5;
-							double random_double = (Math.random() * (max - min)) + min;
+			// Select parents
 
-							// TODO: remember population
-							child[j] = random_double;
+			// Apply crossover / mutation operators
 
-						}
+			// Check fitness of unknown fuction: determines your grade
+			// needs real-value values but conversions before are okay
+			Double fitness = (double) evaluation_.evaluate(childrens[2]);
+			evals++;
 
-						System.out.println(Arrays.toString(child));
-				}
+			// Select survivors
 
-        int evals = 0;
+		}
+	}
 
-        // calculate fitness
-        while(evals<evaluations_limit_) {
 
-					// Select parents
+	public double[][] create_population() {
 
-					// Apply crossover / mutation operators
 
-					// Check fitness of unknown fuction: determines your grade
-					// needs real-value values but conversions before are okay
-					Double fitness = (double) evaluation_.evaluate(child);
-					evals++;
+		// define population size
+		int pop_size = 100;
+		int dim = 10;
 
-					// Select survivors
+		double children[][] = new double[pop_size][];
 
-        }
+		// initialize population randomly
+		for (int i = 0; i < 100; i++) {
+			double child[] = new double[dim];
+
+			for (int j = 0; j < 10; j++) {
+				int min = -5;
+				int max = 5;
+				double random_double = (Math.random() * (max - min)) + min;
+
+				// TODO: remember population
+				child[j] = random_double;
+
+			}
+			children[i] = child;
+
+//			System.out.println(Arrays.toString(child));
+		}
+		return children;
+
 
 	}
 }
