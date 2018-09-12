@@ -73,8 +73,6 @@ public class player36 implements ContestSubmission
 
 
 	public double[][] create_population() {
-
-
 		// define population size
 		int pop_size = 100;
 		int dim = 10;
@@ -85,21 +83,15 @@ public class player36 implements ContestSubmission
 		for (int i = 0; i < 100; i++) {
 			double child[] = new double[dim];
 
-			for (int j = 0; j < 10; j++) {
+			for (int j = 0; j < dim; j++) {
 				int min = -5;
 				int max = 5;
 				double random_double = (Math.random() * (max - min)) + min;
-
-				// TODO: remember population
 				child[j] = random_double;
 
 			}
 			children[i] = child;
-
-//			System.out.println(Arrays.toString(child));
 		}
 		return children;
-
-
 	}
 }
