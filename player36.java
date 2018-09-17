@@ -1,11 +1,16 @@
 import org.vu.contest.ContestSubmission;
 import org.vu.contest.ContestEvaluation;
+// import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Random;
 import java.util.Properties;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
+import java.util.HashSet;
+import java.util.Set;
+import java.lang.Math;
 
 public class player36 implements ContestSubmission
 {
@@ -66,7 +71,7 @@ public class player36 implements ContestSubmission
 
 		
 		// calculate fitness
-		while (evals < evaluations_limit_) {
+		while (evals < evaluations_limit_/10) {
 			System.out.println(evals);
 		// for (int generations = 0; generations < 100; generations++) {
 
@@ -96,6 +101,7 @@ public class player36 implements ContestSubmission
 				evals++;
 			}
 
+			// Sort algorithm from min to max fitness
 			double temp[] = new double[2];
 			for (int n = 0; n < survival_chances.length; n++) {
 				for (int m = 0; m < survival_chances.length; m++){
@@ -109,18 +115,41 @@ public class player36 implements ContestSubmission
 
 			for (int a = 0; a < survival_chances.length; a++){
 				System.out.println(Arrays.toString(survival_chances[a]));
+				System.out.println(Arrays.toString(childrens[(int) survival_chances[a][1]]));
+				// System.out.println(Arrays.toString(childrens[[survival_chances[a][1]]]));
 			}
 
-			// System.out.println(avg_fitness/100);
+			// Create average gene for best fitness and for each of population
+			// for (int j = 0; j < childrens.length; j++) {
+			// 	for (int c = 0; c < childrens[j].length; c++) {
+			// 		childrens[j][c] = (childrens[j][c]+childrens[best][c])/2;
+			// 	}
+			// }
 
-			// System.out.println(best_value);
-			//System.out.println(best);
-			// System.out.println(Arrays.toString(childrens[best]));
-			for (int j = 0; j < childrens.length; j++) {
-				for (int c = 0; c < childrens[j].length; c++) {
-					childrens[j][c] = (childrens[j][c]+childrens[best][c])/2;
+			// Have for child_n in range of popsize, mate 1 with 2 and 2 with 3 ... to n.
+			for (int j = survival_chances.length/2; j < survival_chances.length-1; j++) {
+				int index_val1 = (int) survival_chances[j][1];
+				int index_val2 = (int) survival_chances[j+1][1];
+				for (int gen_index = 0; gen_index < childrens[index_val1].length; gen_index++) {
+					//childrens[index_val1][c] = (childrens[index_val1][c]+childrens[index_val2][c])/2;
+					//recombine genes for best 50 with their +1 incremented counterparts
+					for (int i : printRandomNumbers(5,9)) {
+        				childrens[index_val1][i] = childrens[index_val2][i];
+    				} 
+
+    				// replace worst 50 children with best 50 with a slight mutation
+					int index_val_mutate = (int) survival_chances[j-survival_chances.length/2][1];
+					childrens[index_val_mutate] = childrens[index_val1];
+					for (int i : printRandomNumbers(2,9)) {
+						int min = -5;
+						int max = 5;
+						double random_double = (Math.random() * (max - min)) + min;
+        				childrens[index_val_mutate][i] = random_double;
+    				} 
 				}
 			}
+
+
 
 			glb_best = best;
 			// System.out.println(glb_best);
@@ -128,8 +157,44 @@ public class player36 implements ContestSubmission
 		}
 
 		System.out.println(Arrays.toString(childrens[glb_best]));
+		for (double child : childrens[glb_best]) {
+			System.out.print(0.01*(int) Math.round(child*100));
+			System.out.print("\t");
+		}
 	}
 
+	// TODO write function that loops over array for prettyprinting
+	// Prettify genes for better readibilty
+	// public float prettify_genes(double childrens) {
+	// 	for (int child : childrens) {
+	// 		System.out.println(child);
+	// 	}
+
+
+	// 	return childrens
+	// }
+
+
+	// This is a function that generates random numbers between a range, without repetition
+	// http://www.codecodex.com/wiki/Generate_Random_Numbers_Without_Repetition
+	public static final Random gen = new Random();  
+    public static int[] printRandomNumbers(int n, int maxRange) {  
+        assert n <= maxRange : "There aren't more unique numbers in this range";  
+          
+        int[] result = new int[n];  
+        Set<Integer> used = new HashSet<Integer>();  
+          
+        for (int i = 0; i < n; i++) {  
+              
+            int newRandom;  
+            do {  
+                newRandom = gen.nextInt(maxRange+1);  
+            } while (used.contains(newRandom));  
+            result[i] = newRandom;  
+            used.add(newRandom);  
+        }  
+        return result;  
+    }
 
 	public double[][] create_population() {
 		// define population size
