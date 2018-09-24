@@ -96,7 +96,7 @@ public class player36 implements ContestSubmission
 
 				// calculate and save the fitness of this individual
 				Double fitness = (double) evaluation_.evaluate(childrens[i]);
-				avg_fitness = avg_fitness + fitness;
+				avg_fitness += fitness;
 				survival_chances[i][0] = fitness;
 				survival_chances[i][1] = i;
 
@@ -139,9 +139,7 @@ public class player36 implements ContestSubmission
 					int index_val_mutate = (int) sorted_survival_chances[j-sorted_survival_chances.length/2][1];
 					childrens[index_val_mutate] = childrens[index_val1];
 					for (int i : printRandomNumbers(2,9)) {
-						int min = -5;
-						int max = 5;
-						double random_double = (Math.random() * (max - min)) + min;
+						double random_double = get_random_double(-5, 5);
         				childrens[index_val_mutate][i] = random_double;
     				}
 				}
@@ -163,6 +161,7 @@ public class player36 implements ContestSubmission
 		}
 	}
 
+	// TODO write better sorting algorithm
 	public double[][] sort_survival_chances(double[][] survival_chances) {
 		// sort algorithm that sorts the children on fitness from min to max
 
@@ -181,6 +180,7 @@ public class player36 implements ContestSubmission
 	}
 
 	public double[] make_half_half_child(double[] mom, double[] dad) {
+
 		double[] child = new double[10];
 
 		for (int i = 0; i < mom.length; i++) {
@@ -194,6 +194,11 @@ public class player36 implements ContestSubmission
 		return child;
 	}
 
+	// TODO write function with DNA library
+
+	// TODO write function who lives, who dies, who tells your story
+	// Slechtste twee per rondje gaan dood (want komen er twee bij)
+
 	// TODO write function that loops over array for prettyprinting
 	// Prettify genes for better readibilty
 	// public float prettify_genes(double childrens) {
@@ -206,22 +211,22 @@ public class player36 implements ContestSubmission
 	// }
 
 	public void makeGraph() {
-		// ArrayList<Bar> values = new ArrayList<Bar>();
-		//
-		// for (int i = 0; i < 365; i++) {
-		//      double d = Math.random();
-		//      values.add(new Bar((int)(100 * d), Color.GRAY, ""));
-		// }
-		//
-		// Axis yAxis = new Axis(100, 0, 50, 10, 1, "Percent Sunlight");
-		// BarChart barChart = new BarChart(values, yAxis);
-		//
-		// barChart.width = 1000;
-		// barChart.xAxis = "Day of Year";
-		// barChart.titleFont = new Font("Ariel", Font.PLAIN, 24);
-		// barChart.title = "Annual Sunlight Variability";
-		//
-		// barChart.barWidth = 1;
+//		 ArrayList<Bar> values = new ArrayList<Bar>();
+//
+//		for (int i = 0; i < 365; i++) {
+//		      double d = Math.random();
+//		      values.add(new Bar((int)(100 * d), Color.GRAY, ""));
+//		 }
+//
+//		 Axis yAxis = new Axis(100, 0, 50, 10, 1, "Percent Sunlight");
+//		 BarChart barChart = new BarChart(values, yAxis);
+//
+//		 barChart.width = 1000;
+//		 barChart.xAxis = "Day of Year";
+//		 barChart.titleFont = new Font("Ariel", Font.PLAIN, 24);
+//		 barChart.title = "Annual Sunlight Variability";
+//
+//		 barChart.barWidth = 1;
 	}
 
 	// This is a function that generates random numbers between a range, without repetition
@@ -245,6 +250,12 @@ public class player36 implements ContestSubmission
         return result;
     }
 
+	// Returns a random double between certain values
+	public double get_random_double(int min, int max) {
+
+		return (Math.random() * (max - min)) + min;
+	}
+
 	// This is a function that initializes the population with random individuals
 	public double[][] create_population() {
 		// define population size
@@ -258,9 +269,7 @@ public class player36 implements ContestSubmission
 			double child[] = new double[dim];
 
 			for (int j = 0; j < dim; j++) {
-				int min = -5;
-				int max = 5;
-				double random_double = (Math.random() * (max - min)) + min;
+				double random_double = get_random_double(-5, 5);
 				child[j] = random_double;
 
 			}
