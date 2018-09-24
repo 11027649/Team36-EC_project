@@ -162,29 +162,14 @@ public class player36 implements ContestSubmission
 		}
 
 		// plot the scores of the last population
-		// ArrayList<Bar> values = new ArrayList<Bar>();
-		//
-		// for (int i = 0; i < 365; i++) {
-		//      double d = Math.random();
-		//      values.add(new Bar((int)(100 * d), Color.GRAY, ""));
-		// }
-		//
-		// Axis yAxis4 = new Axis(100, 0, 50, 10, 1, "Percent Sunlight");
-		// BarChart barChart4 = new BarChart(values, yAxis4);
-		//
-		// barChart4.width = 1000;
-		// barChart4.xAxis = "Day of Year";
-		// barChart4.titleFont = new Font("Ariel", Font.PLAIN, 24);
-		// barChart4.title = "Annual Sunlight Variability";
-		//
-		// barChart4.barWidth = 1;
-		//
-		// // print out global best
-		// System.out.println(Arrays.toString(childrens[glb_best]));
-		// for (double child : childrens[glb_best]) {
-		// 	System.out.print(0.01*(int) Math.round(child*100));
-		// 	System.out.print("\t");
-		// }
+		makeGraph();
+
+		// print out global best
+		System.out.println(Arrays.toString(childrens[glb_best]));
+		for (double child : childrens[glb_best]) {
+			System.out.print(0.01*(int) Math.round(child*100));
+			System.out.print("\t");
+		}
 	}
 
 	// TODO write function that loops over array for prettyprinting
@@ -198,6 +183,24 @@ public class player36 implements ContestSubmission
 	// 	return childrens
 	// }
 
+	public void makeGraph() {
+		// ArrayList<Bar> values = new ArrayList<Bar>();
+		//
+		// for (int i = 0; i < 365; i++) {
+		//      double d = Math.random();
+		//      values.add(new Bar((int)(100 * d), Color.GRAY, ""));
+		// }
+		//
+		// Axis yAxis = new Axis(100, 0, 50, 10, 1, "Percent Sunlight");
+		// BarChart barChart = new BarChart(values, yAxis);
+		//
+		// barChart.width = 1000;
+		// barChart.xAxis = "Day of Year";
+		// barChart.titleFont = new Font("Ariel", Font.PLAIN, 24);
+		// barChart.title = "Annual Sunlight Variability";
+		//
+		// barChart.barWidth = 1;
+	}
 
 	// This is a function that generates random numbers between a range, without repetition
 	// http://www.codecodex.com/wiki/Generate_Random_Numbers_Without_Repetition
@@ -220,12 +223,11 @@ public class player36 implements ContestSubmission
         return result;
     }
 
+	// This is a function that initializes the population with random individuals
 	public double[][] create_population() {
 		// define population size
 		int pop_size = 100;
 		int dim = 10;
-
-
 
 		double children[][] = new double[pop_size][];
 
