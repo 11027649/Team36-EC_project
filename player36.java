@@ -109,21 +109,12 @@ public class player36 implements ContestSubmission
 			}
 
 			// Sort algorithm from min to max fitness
-			double temp[] = new double[2];
-			for (int n = 0; n < survival_chances.length; n++) {
-				for (int m = 0; m < survival_chances.length; m++){
-					if (survival_chances[n][0] < survival_chances[m][0]) {
-						temp = survival_chances[n];
-						survival_chances[n] = survival_chances[m];
-						survival_chances[m] = temp;
-					}
-				}
-			}
+			double[][] sorted_survival_chances = sort_survival_chances(survival_chances);
 
 			// print out the individual and the score
-			for (int a = 0; a < survival_chances.length; a++){
-				System.out.println(Arrays.toString(survival_chances[a]));
-				System.out.println(Arrays.toString(childrens[(int) survival_chances[a][1]]));
+			for (int a = 0; a < sorted_survival_chances.length; a++){
+				System.out.println(Arrays.toString(sorted_survival_chances[a]));
+				System.out.println(Arrays.toString(childrens[(int) sorted_survival_chances[a][1]]));
 			}
 
 			// Create average gene for best fitness and for each of population
@@ -134,9 +125,9 @@ public class player36 implements ContestSubmission
 			// }
 
 			// Have for child_n in range of popsize, mate 1 with 2 and 2 with 3 ... to n.
-			for (int j = survival_chances.length/2; j < survival_chances.length-1; j++) {
-				int index_val1 = (int) survival_chances[j][1];
-				int index_val2 = (int) survival_chances[j+1][1];
+			for (int j = survival_chances.length/2; j < sorted_survival_chances.length-1; j++) {
+				int index_val1 = (int) sorted_survival_chances[j][1];
+				int index_val2 = (int) sorted_survival_chances[j+1][1];
 				for (int gen_index = 0; gen_index < childrens[index_val1].length; gen_index++) {
 					//childrens[index_val1][c] = (childrens[index_val1][c]+childrens[index_val2][c])/2;
 					//recombine genes for best 50 with their +1 incremented counterparts
@@ -145,7 +136,7 @@ public class player36 implements ContestSubmission
     				}
 
     				// replace worst 50 children with best 50 with a slight mutation
-					int index_val_mutate = (int) survival_chances[j-survival_chances.length/2][1];
+					int index_val_mutate = (int) sorted_survival_chances[j-sorted_survival_chances.length/2][1];
 					childrens[index_val_mutate] = childrens[index_val1];
 					for (int i : printRandomNumbers(2,9)) {
 						int min = -5;
@@ -170,6 +161,37 @@ public class player36 implements ContestSubmission
 			System.out.print(0.01*(int) Math.round(child*100));
 			System.out.print("\t");
 		}
+	}
+
+	public double[][] sort_survival_chances(double[][] survival_chances) {
+		// sort algorithm that sorts the children on fitness from min to max
+
+		double temp[] = new double[2];
+		for (int n = 0; n < survival_chances.length; n++) {
+			for (int m = 0; m < survival_chances.length; m++){
+				if (survival_chances[n][0] < survival_chances[m][0]) {
+					temp = survival_chances[n];
+					survival_chances[n] = survival_chances[m];
+					survival_chances[m] = temp;
+				}
+			}
+		}
+		return survival_chances;
+
+	}
+
+	public double[] make_half_half_child(double[] mom, double[] dad) {
+		double[] child = new double[10];
+
+		for (int i = 0; i < mom.length; i++) {
+			if (i < mom.length / 2) {
+				child[i] = mom[i];
+			} else {
+				child[i] = dad[i];
+			}
+		}
+
+		return child;
 	}
 
 	// TODO write function that loops over array for prettyprinting
