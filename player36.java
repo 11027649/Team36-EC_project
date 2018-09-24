@@ -10,7 +10,11 @@ import java.util.List;
 import java.util.stream.IntStream;
 import java.util.HashSet;
 import java.util.Set;
+
 import java.lang.Math;
+
+import java.awt.Font;
+import java.awt.Color;
 
 public class player36 implements ContestSubmission
 {
@@ -62,6 +66,8 @@ public class player36 implements ContestSubmission
 
 		int survival_chance = 0;
 		double survival_chances[][] = new double[childrens.length][];
+
+		// make an array that corresponds with the population to save the scores
 		for (int k = 0; k < childrens.length; k++) {
 			double surv_chance[] = new double[2];
 			surv_chance[0] = 0;
@@ -69,11 +75,11 @@ public class player36 implements ContestSubmission
 			survival_chances[k] = surv_chance;
 		}
 
-		
+
 		// calculate fitness
 		while (evals < evaluations_limit_/10) {
 			System.out.println(evals);
-		// for (int generations = 0; generations < 100; generations++) {
+			// for (int generations = 0; generations < 100; generations++) {
 
 			// Select parents
 
@@ -87,13 +93,14 @@ public class player36 implements ContestSubmission
 			int best = 0;
 			double best_value = -100;
 			for (int i = 0; i < childrens.length; i++) {
-				// System.out.println(Arrays.toString(childrens[i]));
-				// System.out.println(i);
+
+				// calculate and save the fitness of this individual
 				Double fitness = (double) evaluation_.evaluate(childrens[i]);
 				avg_fitness = avg_fitness + fitness;
 				survival_chances[i][0] = fitness;
 				survival_chances[i][1] = i;
-				//System.out.println(Arrays.toString(survival_chances[i]));
+
+				// save the best individual
 				if (fitness > best_value) {
 					best_value = fitness;
 					best = i;
@@ -113,10 +120,10 @@ public class player36 implements ContestSubmission
 				}
 			}
 
+			// print out the individual and the score
 			for (int a = 0; a < survival_chances.length; a++){
 				System.out.println(Arrays.toString(survival_chances[a]));
 				System.out.println(Arrays.toString(childrens[(int) survival_chances[a][1]]));
-				// System.out.println(Arrays.toString(childrens[[survival_chances[a][1]]]));
 			}
 
 			// Create average gene for best fitness and for each of population
@@ -135,7 +142,7 @@ public class player36 implements ContestSubmission
 					//recombine genes for best 50 with their +1 incremented counterparts
 					for (int i : printRandomNumbers(5,9)) {
         				childrens[index_val1][i] = childrens[index_val2][i];
-    				} 
+    				}
 
     				// replace worst 50 children with best 50 with a slight mutation
 					int index_val_mutate = (int) survival_chances[j-survival_chances.length/2][1];
@@ -145,22 +152,39 @@ public class player36 implements ContestSubmission
 						int max = 5;
 						double random_double = (Math.random() * (max - min)) + min;
         				childrens[index_val_mutate][i] = random_double;
-    				} 
+    				}
 				}
 			}
-
-
 
 			glb_best = best;
 			// System.out.println(glb_best);
 
 		}
 
-		System.out.println(Arrays.toString(childrens[glb_best]));
-		for (double child : childrens[glb_best]) {
-			System.out.print(0.01*(int) Math.round(child*100));
-			System.out.print("\t");
-		}
+		// plot the scores of the last population
+		// ArrayList<Bar> values = new ArrayList<Bar>();
+		//
+		// for (int i = 0; i < 365; i++) {
+		//      double d = Math.random();
+		//      values.add(new Bar((int)(100 * d), Color.GRAY, ""));
+		// }
+		//
+		// Axis yAxis4 = new Axis(100, 0, 50, 10, 1, "Percent Sunlight");
+		// BarChart barChart4 = new BarChart(values, yAxis4);
+		//
+		// barChart4.width = 1000;
+		// barChart4.xAxis = "Day of Year";
+		// barChart4.titleFont = new Font("Ariel", Font.PLAIN, 24);
+		// barChart4.title = "Annual Sunlight Variability";
+		//
+		// barChart4.barWidth = 1;
+		//
+		// // print out global best
+		// System.out.println(Arrays.toString(childrens[glb_best]));
+		// for (double child : childrens[glb_best]) {
+		// 	System.out.print(0.01*(int) Math.round(child*100));
+		// 	System.out.print("\t");
+		// }
 	}
 
 	// TODO write function that loops over array for prettyprinting
@@ -177,23 +201,23 @@ public class player36 implements ContestSubmission
 
 	// This is a function that generates random numbers between a range, without repetition
 	// http://www.codecodex.com/wiki/Generate_Random_Numbers_Without_Repetition
-	public static final Random gen = new Random();  
-    public static int[] printRandomNumbers(int n, int maxRange) {  
-        assert n <= maxRange : "There aren't more unique numbers in this range";  
-          
-        int[] result = new int[n];  
-        Set<Integer> used = new HashSet<Integer>();  
-          
-        for (int i = 0; i < n; i++) {  
-              
-            int newRandom;  
-            do {  
-                newRandom = gen.nextInt(maxRange+1);  
-            } while (used.contains(newRandom));  
-            result[i] = newRandom;  
-            used.add(newRandom);  
-        }  
-        return result;  
+	public static final Random gen = new Random();
+    public static int[] printRandomNumbers(int n, int maxRange) {
+        assert n <= maxRange : "There aren't more unique numbers in this range";
+
+        int[] result = new int[n];
+        Set<Integer> used = new HashSet<Integer>();
+
+        for (int i = 0; i < n; i++) {
+
+            int newRandom;
+            do {
+                newRandom = gen.nextInt(maxRange+1);
+            } while (used.contains(newRandom));
+            result[i] = newRandom;
+            used.add(newRandom);
+        }
+        return result;
     }
 
 	public double[][] create_population() {
@@ -201,7 +225,7 @@ public class player36 implements ContestSubmission
 		int pop_size = 100;
 		int dim = 10;
 
-		
+
 
 		double children[][] = new double[pop_size][];
 
