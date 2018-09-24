@@ -22,6 +22,8 @@ public class player36 implements ContestSubmission
 	ContestEvaluation evaluation_;
     private int evaluations_limit_;
 
+    public int evals = 0;
+
 	public player36()
 	{
 		rnd_ = new Random();
@@ -52,7 +54,7 @@ public class player36 implements ContestSubmission
 			// Do sth with property values, e.g. specify relevant settings of your algorithm
 	    if(isMultimodal){
 	        // Do sth
-	    }else{
+	    } else{
 	        // Do sth else
 	    }
     }
@@ -60,25 +62,43 @@ public class player36 implements ContestSubmission
 	public void run() {
 		// Run your algorithm here
 
-		int evals = 0;
+		// int evals = 0;
+
+		// amount of random people from population
+		int n = 5;
+
+		// maak de populatie aan
 		double childrens[][] = create_population();
 		int glb_best = 0;
 
-		int survival_chance = 0;
-		double survival_chances[][] = new double[childrens.length][];
+		// bepaal voor de hele populatie per kind de fitness.
+		double survival_chances[][] = score_checker(childrens);
 
-		// make an array that corresponds with the population to save the scores
-		for (int k = 0; k < childrens.length; k++) {
-			double surv_chance[] = new double[2];
-			surv_chance[0] = 0;
-			surv_chance[1] = survival_chance;
-			survival_chances[k] = surv_chance;
+		// sorteer de score array op fitness
+		double sort_list[][] = sort_survival_chances(survival_chances);
+		for (int i = 0; i < sort_list.length; i++) {
+			System.out.println(Arrays.toString(sort_list[i]));
 		}
+
+		// ask for 5 random ints between  0 - 99
+		int random_number_list[] = printRandomNumbers(n, 99);
+
+		double random_5_people[][] = new double[n][];
+
+		// search these 5 people and save
+		for (int i = 0; i < random_number_list.length; i++) {
+
+			// put the index number in a variable
+			int index_number = random_number_list[i];
+			random_5_people[i] = sort_list[index_number];
+			System.out.println(Arrays.toString(random_5_people[i]));
+		}
+
 
 
 		// calculate fitness
 		while (evals < evaluations_limit_/10) {
-			System.out.println(evals);
+			// System.out.println(evals);
 			// for (int generations = 0; generations < 100; generations++) {
 
 			// Select parents
@@ -112,10 +132,10 @@ public class player36 implements ContestSubmission
 			double[][] sorted_survival_chances = sort_survival_chances(survival_chances);
 
 			// print out the individual and the score
-			for (int a = 0; a < sorted_survival_chances.length; a++){
-				System.out.println(Arrays.toString(sorted_survival_chances[a]));
-				System.out.println(Arrays.toString(childrens[(int) sorted_survival_chances[a][1]]));
-			}
+			// for (int a = 0; a < sorted_survival_chances.length; a++){
+			// 	System.out.println(Arrays.toString(sorted_survival_chances[a]));
+			// 	System.out.println(Arrays.toString(childrens[(int) sorted_survival_chances[a][1]]));
+			// }
 
 			// Create average gene for best fitness and for each of population
 			// for (int j = 0; j < childrens.length; j++) {
@@ -125,40 +145,70 @@ public class player36 implements ContestSubmission
 			// }
 
 			// Have for child_n in range of popsize, mate 1 with 2 and 2 with 3 ... to n.
-			for (int j = survival_chances.length/2; j < sorted_survival_chances.length-1; j++) {
-				int index_val1 = (int) sorted_survival_chances[j][1];
-				int index_val2 = (int) sorted_survival_chances[j+1][1];
-				for (int gen_index = 0; gen_index < childrens[index_val1].length; gen_index++) {
-					//childrens[index_val1][c] = (childrens[index_val1][c]+childrens[index_val2][c])/2;
-					//recombine genes for best 50 with their +1 incremented counterparts
-					for (int i : printRandomNumbers(5,9)) {
-        				childrens[index_val1][i] = childrens[index_val2][i];
-    				}
+			// for (int j = survival_chances.length/2; j < sorted_survival_chances.length-1; j++) {
+			// 	int index_val1 = (int) sorted_survival_chances[j][1];
+			// 	int index_val2 = (int) sorted_survival_chances[j+1][1];
+			// 	for (int gen_index = 0; gen_index < childrens[index_val1].length; gen_index++) {
+			// 		//childrens[index_val1][c] = (childrens[index_val1][c]+childrens[index_val2][c])/2;
+			// 		//recombine genes for best 50 with their +1 incremented counterparts
+			// 		for (int i : printRandomNumbers(5,9)) {
+   //      				childrens[index_val1][i] = childrens[index_val2][i];
+   //  				}
 
-    				// replace worst 50 children with best 50 with a slight mutation
-					int index_val_mutate = (int) sorted_survival_chances[j-sorted_survival_chances.length/2][1];
-					childrens[index_val_mutate] = childrens[index_val1];
-					for (int i : printRandomNumbers(2,9)) {
-						double random_double = get_random_double(-5, 5);
-        				childrens[index_val_mutate][i] = random_double;
-    				}
-				}
-			}
+   //  				// replace worst 50 children with best 50 with a slight mutation
+			// 		int index_val_mutate = (int) sorted_survival_chances[j-sorted_survival_chances.length/2][1];
+			// 		childrens[index_val_mutate] = childrens[index_val1];
+			// 		for (int i : printRandomNumbers(2,9)) {
+			// 			double random_double = get_random_double(-5, 5);
+   //      				childrens[index_val_mutate][i] = random_double;
+   //  				}
+			// 	}
+			// }
 
 			glb_best = best;
 			// System.out.println(glb_best);
 
 		}
 
+		System.out.println("OHOHHOHO");
+
 		// plot the scores of the last population
-		makeGraph();
+		// makeGraph();
 
 		// print out global best
-		System.out.println(Arrays.toString(childrens[glb_best]));
-		for (double child : childrens[glb_best]) {
-			System.out.print(0.01*(int) Math.round(child*100));
-			System.out.print("\t");
+	// 	System.out.println(Arrays.toString(childrens[glb_best]));
+	// 	for (double child : childrens[glb_best]) {
+	// 		System.out.print(0.01*(int) Math.round(child*100));
+	// 		System.out.print("\t");
+	// 	}
+	}
+
+	public double[][] score_checker( double[][] childrens) {
+
+		// in this array we place the score and index
+		
+		double fitness_index_array[][] = new double[childrens.length][];
+
+		for (int i = 0; i < childrens.length; i++) {
+
+			double fit_index_array[] = new double [2];
+
+			// calculate and save the fitness of this individual
+			double fitness = (double) evaluation_.evaluate(childrens[i]);
+			
+			// on the ith array at the left side, place the fitness
+			fit_index_array[0] = fitness;
+
+			// on the ith array at the right side, place the index number
+			fit_index_array[1] = i;
+
+			// place the array in the big array
+			fitness_index_array[i] = fit_index_array;
+
+			evals++;
 		}
+
+		return fitness_index_array;
 	}
 
 	// TODO write better sorting algorithm
@@ -279,5 +329,33 @@ public class player36 implements ContestSubmission
 		// double[] curr_top = new double[] {-1.1891876987039534, 3.802704764222131, -0.7045031488811008, -3.214820204008321, 0.9342012108821499, -1.6280075915460186, 1.1164003795515511, -0.7854278491364934, 1.7478175537980336, -0.45014115827163426};
 		// children[1] = curr_top;
 		return children;
+	}
+
+	// CODE EMMA@@@@@@@@
+	// Creates two children that mirror each other, and together can form their parents. 
+	public void create_two_children(double[] mom, double[] dad) {
+	   double[] boy = new double[10];
+	   double[] girl = new double[10];
+	   int[] parent_indices = printRandomNumbers(5, 9);
+	   System.out.println(Arrays.toString(parent_indices));
+
+	   for (int i = 0; i < mom.length; i++) {
+	      if (in_parent_indices(parent_indices, i)) {
+	         boy[i] = mom[i];
+	         girl[i] = dad[i];
+	      } else {
+	         boy[i] = dad[i];
+	         girl[i] = mom[i];
+	      }
+	   }
+	}
+
+	public boolean in_parent_indices(int[] parent_indices, int n) {
+	       for (int i = 0; i < parent_indices.length; i++) {
+	          if (n == parent_indices[i]) {
+	             return true;
+	      }
+	   }
+	   return false;
 	}
 }
