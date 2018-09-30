@@ -75,11 +75,18 @@ public class player36 implements ContestSubmission
 		// sort algorithm that sorts the children on fitness from min to max
 		double sorted_survival_chances[][] = sort_survival_chances(survival_chances);
 
+		// prints the sorted population
+		// System.out.println("\n\n sorted population \n\n");
+		// for (int i = 0; i < sorted_survival_chances.length; i++) {
+
+		//  	System.out.println(Arrays.toString(sorted_survival_chances[i]));	
+		// }
+
 		// Amount of random elements from population
 		int n = 5;
 
 		// Calculate fitness
-		while (evals < evaluations_limit_) {
+		while (evals < 300) {
 
 			// Select random n parents from the polutation. This is a array with 1. parent fitness score 2. index number
 			double[][] random_n_elements = select_n_random_elements(n, sorted_survival_chances);
@@ -90,7 +97,7 @@ public class player36 implements ContestSubmission
 					System.out.println(random_n_elements[i][j]);
 				}
 			}
-			
+
 			// function input is the list of n random parents. It secelets 2 parents from the n input parents.
 			double[][] parents = select_parents(random_n_elements);
 
@@ -102,21 +109,35 @@ public class player36 implements ContestSubmission
 				}
 			}
 
-			// double[][] children = create_two_children(childrens[(int) parents[0][1]], childrens[(int) parents[1][1]]);
-			// double[] boy = children[0], girl = children[1];
+			System.out.println("\n\n ouders die in de functie create_two children gaan \n\n");
+			System.out.println(parents[0][1]);
+			System.out.println(parents[1][1]);
 
-//			System.out.println("\n\nBoy\n");
-//			for (int j = 0; j < boy.length; j++) {
-//				System.out.println(boy[j]);
-//			}
-//			System.out.println("\n\nGirl\n");
-//			System.out.println(girl.length);
-//			for (int j = 0; j < girl.length; j++) {
-//				System.out.println(girl[j]);
-//			}
+			// geef de index nummers van de gekozen ouders mee
+			double[][] children = create_two_children(childrens[(int) parents[0][1]], childrens[(int) parents[1][1]]);
+			// children an array of 2 kids with each 10 gens
 
 
-			// childrens = who_lives_who_dies(sorted_survival_chances, childrens, boy, girl);
+
+			System.out.println("\n\n new kids on the block\n");
+
+			double[] boy = children[0], girl = children[1];
+
+			System.out.println("\n\nBoy\n");
+			for (int j = 0; j < boy.length; j++) {
+				System.out.println(boy[j]);
+			}
+			System.out.println("\n\nGirl\n");
+			System.out.println(girl.length);
+			for (int j = 0; j < girl.length; j++) {
+				System.out.println(girl[j]);
+			}
+
+			// childrens is the starting population
+			// boy and girl are the two new created kids
+			// sorted_survival .. is the sorted population from min to max
+			// this function replaces the two worst persons in population by the created kids
+			childrens = who_lives_who_dies(sorted_survival_chances, childrens, boy, girl);
 
 			// Apply crossover / mutation operators
 
@@ -426,11 +447,19 @@ public class player36 implements ContestSubmission
 	// CODE EMMA@@@@@@@@
 	// Creates two children that mirror each other, and together can form their parents. 
 
+
+
 	public double[][] create_two_children(double[] mom, double[] dad) {
+		// mom/dad is a parents with 10 genes 
+
+		// make 10 places per child for the genes
     	double[] boy = new double[10];
 	    double[] girl = new double[10];
+
+
+	    // make 5 int in an array from 0 - 9
 	    int[] parent_indices = printRandomNumbers(5, 9);
-	    //System.out.println(Arrays.toString(parent_indices));
+	    // System.out.println(Arrays.toString(parent_indices));
 
 	    for (int i = 0; i < mom.length; i++) {
 	       if (in_parent_indices(parent_indices, i)) {
