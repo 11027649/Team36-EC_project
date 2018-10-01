@@ -97,50 +97,10 @@ public class player36 implements ContestSubmission
 			// function input is the list of n random parents. It secelets 2 parents from the n input parents.
 			double[][] parents = tournamen_parent_selection(10, 2,sorted_survival_chances);
 
-//
-
-//			System.out.println("\n\nParents\n\n");
-//			for (int i = 0; i < parents.length; i++) {
-//				for (int j = 0; j < 2; j++) {
-//					System.out.println(parents[i][j]);
-//				}
-//			}
-//
-//			System.out.println("\n\n ouders die in de functie create_two children gaan \n\n");
-//			System.out.println(parents[0][1]);
-//			System.out.println(parents[1][1]);
-
-			// geef de index nummers van de gekozen ouders mee
-
 			double[][] new_children = create_n_children(childrens, parents);
 
 //			new_children = mutation_swap_function(new_children);
 			new_children = lil_mutation_function(new_children,1);
-
-//			double[][] children = create_two_children(childrens[(int) parents[0][1]], childrens[(int) parents[1][1]]);
-//			// children an array of 2 kids with each 10 gens
-//
-//
-//
-//			System.out.println("\n\n new kids on the block\n");
-//
-//			double[] boy = children[0], girl = children[1];
-//
-//			System.out.println("\n\nBoy\n");
-//			for (int j = 0; j < boy.length; j++) {
-//				System.out.println(boy[j]);
-//			}
-//			System.out.println("\n\nGirl\n");
-//			System.out.println(girl.length);
-//			for (int j = 0; j < girl.length; j++) {
-//				System.out.println(girl[j]);
-//			}
-//
-//			// childrens is the starting population
-//			// boy and girl are the two new created kids
-//			// sorted_survival .. is the sorted population from min to max
-//			// this function replaces the two worst persons in population by the created kids
-//			childrens = who_lives_who_dies(sorted_survival_chances, childrens, boy, girl);
 
 			childrens = who_lives_who_dies(sorted_survival_chances, childrens, new_children);
 			// Apply crossover / mutation operators
@@ -167,63 +127,13 @@ public class player36 implements ContestSubmission
 				}
 				evals++;
 			}
-			// System.out.println("\n\nAverage\n");
-			// System.out.println(avg_fitness / children.length);
 
 			// Sort algorithm from min to max fitness
 			sorted_survival_chances = sort_survival_chances(survival_chances);
 
-			// Create
-			// print out the individual and the score
-			// for (int a = 0; a < sorted_survival_chances.length; a++){
-			// 	System.out.println(Arrays.toString(sorted_survival_chances[a]));
-			// 	System.out.println(Arrays.toString(childrens[(int) sorted_survival_chances[a][1]]));
-			// }
-
-			// Create average gene for best fitness and for each of population
-			// for (int j = 0; j < childrens.length; j++) {
-			// 	for (int c = 0; c < childrens[j].length; c++) {
-			// 		childrens[j][c] = (childrens[j][c]+childrens[best][c])/2;
-			// 	}
-			// }
-
-			// Have for child_n in range of popsize, mate 1 with 2 and 2 with 3 ... to n.
-			// for (int j = survival_chances.length/2; j < sorted_survival_chances.length-1; j++) {
-			// 	int index_val1 = (int) sorted_survival_chances[j][1];
-			// 	int index_val2 = (int) sorted_survival_chances[j+1][1];
-			// 	for (int gen_index = 0; gen_index < childrens[index_val1].length; gen_index++) {
-			// 		//childrens[index_val1][c] = (childrens[index_val1][c]+childrens[index_val2][c])/2;
-			// 		//recombine genes for best 50 with their +1 incremented counterparts
-			// 		for (int i : printRandomNumbers(5,9)) {
-   //      				childrens[index_val1][i] = childrens[index_val2][i];
-   //  				}
-
-   //  				// replace worst 50 children with best 50 with a slight mutation
-			// 		int index_val_mutate = (int) sorted_survival_chances[j-sorted_survival_chances.length/2][1];
-			// 		childrens[index_val_mutate] = childrens[index_val1];
-			// 		for (int i : printRandomNumbers(2,9)) {
-			// 			double random_double = get_random_double(-5, 5);
-   //      				childrens[index_val_mutate][i] = random_double;
-   //  				}
-			// 	}
-			// }
-
 			glb_best = best;
-			// System.out.println(glb_best);
 
 		}
-
-		//System.out.println("OHOHHOHO");
-
-		// plot the scores of the last population
-		// makeGraph();
-
-		// print out global best
-	// 	System.out.println(Arrays.toString(childrens[glb_best]));
-	// 	for (double child : childrens[glb_best]) {
-	// 		System.out.print(0.01*(int) Math.round(child*100));
-	// 		System.out.print("\t");
-	// 	}
 	}
 
 	public double[][] mutation_swap_function(double [][] new_kids ) {
