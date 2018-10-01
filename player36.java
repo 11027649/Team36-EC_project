@@ -86,59 +86,57 @@ public class player36 implements ContestSubmission
 		int n = 5;
 
 		// Calculate fitness
-		while (evals < 300) {
-
-			// Select random n parents from the polutation. This is a array with 1. parent fitness score 2. index number
-			double[][] random_n_elements = select_n_random_elements(n, sorted_survival_chances);
-
-			System.out.println("\n\nRandom five\n\n");
-			for (int i = 0; i < random_n_elements.length; i++) {
-				for (int j = 0; j < 2; j++) {
-					System.out.println(random_n_elements[i][j]);
-				}
-			}
+		while (evals < evaluations_limit_) {
 
 			// function input is the list of n random parents. It secelets 2 parents from the n input parents.
-			double[][] parents = select_parents(random_n_elements);
+			double[][] parents = tournamen_parent_selection(10, 2,sorted_survival_chances);
 
+//
 
-			System.out.println("\n\nParents\n\n");
-			for (int i = 0; i < parents.length; i++) {
-				for (int j = 0; j < 2; j++) {
-					System.out.println(parents[i][j]);
-				}
-			}
-
-			System.out.println("\n\n ouders die in de functie create_two children gaan \n\n");
-			System.out.println(parents[0][1]);
-			System.out.println(parents[1][1]);
+//			System.out.println("\n\nParents\n\n");
+//			for (int i = 0; i < parents.length; i++) {
+//				for (int j = 0; j < 2; j++) {
+//					System.out.println(parents[i][j]);
+//				}
+//			}
+//
+//			System.out.println("\n\n ouders die in de functie create_two children gaan \n\n");
+//			System.out.println(parents[0][1]);
+//			System.out.println(parents[1][1]);
 
 			// geef de index nummers van de gekozen ouders mee
-			double[][] children = create_two_children(childrens[(int) parents[0][1]], childrens[(int) parents[1][1]]);
-			// children an array of 2 kids with each 10 gens
 
+			double[][] new_children = create_n_children(childrens, parents);
 
+//			new_children = mutation_swap_function(new_children);
+			new_children = lil_mutation_function(new_children,1);
 
-			System.out.println("\n\n new kids on the block\n");
+//			double[][] children = create_two_children(childrens[(int) parents[0][1]], childrens[(int) parents[1][1]]);
+//			// children an array of 2 kids with each 10 gens
+//
+//
+//
+//			System.out.println("\n\n new kids on the block\n");
+//
+//			double[] boy = children[0], girl = children[1];
+//
+//			System.out.println("\n\nBoy\n");
+//			for (int j = 0; j < boy.length; j++) {
+//				System.out.println(boy[j]);
+//			}
+//			System.out.println("\n\nGirl\n");
+//			System.out.println(girl.length);
+//			for (int j = 0; j < girl.length; j++) {
+//				System.out.println(girl[j]);
+//			}
+//
+//			// childrens is the starting population
+//			// boy and girl are the two new created kids
+//			// sorted_survival .. is the sorted population from min to max
+//			// this function replaces the two worst persons in population by the created kids
+//			childrens = who_lives_who_dies(sorted_survival_chances, childrens, boy, girl);
 
-			double[] boy = children[0], girl = children[1];
-
-			System.out.println("\n\nBoy\n");
-			for (int j = 0; j < boy.length; j++) {
-				System.out.println(boy[j]);
-			}
-			System.out.println("\n\nGirl\n");
-			System.out.println(girl.length);
-			for (int j = 0; j < girl.length; j++) {
-				System.out.println(girl[j]);
-			}
-
-			// childrens is the starting population
-			// boy and girl are the two new created kids
-			// sorted_survival .. is the sorted population from min to max
-			// this function replaces the two worst persons in population by the created kids
-			childrens = who_lives_who_dies(sorted_survival_chances, childrens, boy, girl);
-
+			childrens = who_lives_who_dies(sorted_survival_chances, childrens, new_children);
 			// Apply crossover / mutation operators
 
 			// Check fitness of unknown fuction: determines your grade
@@ -222,6 +220,47 @@ public class player36 implements ContestSubmission
 	// 	}
 	}
 
+	public double[][] mutation_swap_function(double [][] new_kids ) {
+		for (int i = 0; i < new_kids.length; i++){
+			double individual_kid[] = new_kids[i];
+
+			// maak een random getal tussen de 0 en de 9
+			int random_numbers [] = printRandomNumbers(2, 9);
+
+			// swap
+			double temp = individual_kid[random_numbers[0]];
+			individual_kid[random_numbers[0]] = individual_kid[random_numbers[1]];
+			individual_kid[random_numbers[1]] = temp;
+
+			new_kids[i] = individual_kid;
+
+		}
+		// let op ,... een swap is soms geen swao omdat je hetzewlfde getal terug krijgt. dit zou niet mogen.
+		return new_kids;
+	}
+
+	//	Lil mutation
+	public double[][] lil_mutation_function(double [][] new_kids, int num_of_mutations) {
+		for (int i = 0; i < new_kids.length; i++){
+			double individual_kid[] = new_kids[i];
+
+			// create a random digit between 0 and 9
+			int random_numbers [] = printRandomNumbers(num_of_mutations, 9);
+
+			for (int j = 0; j < random_numbers.length; j++) {
+				double r = get_random_double(-1,1);
+				individual_kid[j] = individual_kid[j] + r;
+				if (individual_kid[j] > 5 || individual_kid[j] < -5) {
+					individual_kid[j] = individual_kid[j] - r - r;
+				}
+			}
+			new_kids[i] = individual_kid;
+		}
+		// let op... een swap is soms geen swao omdat je hetzewlfde getal terug krijgt. dit zou niet mogen.
+		return new_kids;
+	}
+
+
 	// 
 	public double[][] select_n_random_elements(int n, double[][] sort_list) {
 
@@ -242,11 +281,67 @@ public class player36 implements ContestSubmission
 
 	public double[][] select_parents(double[][] random_n_elements) {
 
-		double[][] parents = new double[2][10];
-		parents[0] = random_n_elements[random_n_elements.length - 1];
-		parents[1] = random_n_elements[random_n_elements.length - 2];
+		double[][] parents = new double[2][2];
+		double[][] sorted = sort_survival_chances(random_n_elements);
+		parents[0] = sorted[random_n_elements.length - 1];
+		parents[1] = sorted[random_n_elements.length - 2];
 		return parents;
 	}
+
+	public double[] select_single_parent(double[][] random_n_elements) {
+		double[][] sorted = sort_survival_chances(random_n_elements);
+		double[] parent = sorted[random_n_elements.length - 1];
+		return parent;
+	}
+
+	public double[][] tournamen_parent_selection(int amount_of_parents, int n, double[][] sorted_survival_chances) {
+		// amount of parents is how many parents should be selected to make
+		// the same number of children. two parents make two children. chidlren have max two paretns.
+		// n = how large the pool of randomly selected elements that will form the parents should be.
+
+		double[][] parents = new double[amount_of_parents][2];
+		for (int i = 0; i < amount_of_parents; i++) {
+			double[][] parents_pool = select_n_random_elements(n, sorted_survival_chances);
+			parents[i] = select_single_parent(parents_pool);
+
+		}
+		System.out.println("ALLAH HAKBAR");
+		System.out.println(evals);
+		for (int i = 0; i < parents.length; i++) {
+			System.out.println(Arrays.toString(parents[i]));
+		}
+
+		return  parents;
+
+
+		// dit alles twee keer
+		// select n random kids from population
+		// save best parent using select single parent function
+		// make new kids via the best parents using the create two children function
+		// replace the worst people in the population by the new kids
+
+
+	}
+
+	public double[][] create_n_children(double[][] childrens, double[][] parents) {
+		double[][] children = new double[parents.length][10];
+
+//		System.out.println("\n\nIk haat m'n ouders\n\n");
+//
+//		for (int i = 0; i < parents.length; i++) {
+//			System.out.println(Arrays.toString(parents[i]));
+//		}
+		for (int i = 0; i < parents.length; i += 2) {
+			double[][] temp_children = create_two_children(childrens[(int) parents[i][1]], childrens[(int) parents[i + 1][1]]);
+			children[i] = temp_children[0];
+			children[i + 1] = temp_children[1];
+		}
+		//			double[][] children = create_two_children(childrens[(int) parents[0][1]], childrens[(int) parents[1][1]]);
+
+		return children;
+
+	}
+
 
 	public double[][] score_checker( double[][] childrens) {
 
@@ -318,37 +413,25 @@ public class player36 implements ContestSubmission
 	// TODO write function who lives, who dies, who tells your story
 	// Slechtste twee per rondje gaan dood (want komen er twee bij)
 
-	public double[][] who_lives_who_dies(double[][] sorted_survival_chances, double[][] children, double[] boy, double[] girl) {
-		// Get index of those to replace
-		int boy_index = (int) sorted_survival_chances[0][1];
-		int girl_index = (int) sorted_survival_chances[1][1];
+	public double[][] who_lives_who_dies(double[][] sorted_survival_chances, double[][] children, double[][] new_children) {
 
-		// System.out.println("\nWorst ones\n");
-		// System.out.println(sorted_survival_chances[0][0]);
+		for (int i = 0; i < new_children.length; i += 2) {
+			// Get index of those to replace
+			int boy_index = (int) sorted_survival_chances[i][1];
+			int girl_index = (int) sorted_survival_chances[i + 1][1];
 
-		for (int i = 0; i < 10; i++) {
-			// System.out.println(children[boy_index][i]);
+			//System.out.println(Arrays.toString(children[boy_index]));
+
+			// Replace worst ones with boy and girl
+			children[boy_index] = new_children[i];
+			children[girl_index] = new_children[i + 1];
+		//	System.out.println(Arrays.toString(new_children[i]));
+
 		}
-		// System.out.println("\n");
-		// System.out.println(sorted_survival_chances[1][0]);
-
-		for (int i = 0; i < 10; i++) {
-			// System.out.println(children[girl_index][i]);
-		}
-
-		// Replace worst ones with boy and girl
-		children[boy_index] = boy;
-		children[girl_index] = girl;
-
-//		System.out.println("\nNew ones\n");
 //
-//		for (int i = 0; i < 10; i++) {
-//			System.out.println(children[boy_index][i]);
-//		}
-//		System.out.println("\n");
+//		for (int i = 0; i < children.length; i++) {
+//			System.out.println(Arrays.toString(children[i]));
 //
-//		for (int i = 0; i < 10; i++) {
-//			System.out.println(children[girl_index][i]);
 //		}
 
 		return children;
