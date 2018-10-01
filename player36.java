@@ -65,12 +65,6 @@ public class player36 implements ContestSubmission
 	public void run() {
 		// Run your algorithm here
 
-		// int evals = 0;
-
-
-		writeToFile("meneer");
-
-
 		// Create population of 100 ppl, each person has 10 gens
 		double childrens[][] = create_population();
 		int glb_best = 0;
@@ -80,13 +74,6 @@ public class player36 implements ContestSubmission
 
 		// sort algorithm that sorts the children on fitness from min to max
 		double sorted_survival_chances[][] = sort_survival_chances(survival_chances);
-
-		// prints the sorted population
-		// System.out.println("\n\n sorted population \n\n");
-		// for (int i = 0; i < sorted_survival_chances.length; i++) {
-
-		//  	System.out.println(Arrays.toString(sorted_survival_chances[i]));
-		// }
 
 		// Amount of random elements from population
 		int n = 5;
@@ -228,46 +215,19 @@ public class player36 implements ContestSubmission
 		}
 
 		return  parents;
-
-
-		// dit alles twee keer
-		// select n random kids from population
-		// save best parent using select single parent function
-		// make new kids via the best parents using the create two children function
-		// replace the worst people in the population by the new kids
-
-
 	}
 
 	public double[][] create_n_children(double[][] childrens, double[][] parents) {
 		double[][] children = new double[parents.length][10];
 
-//		System.out.println("\n\nIk haat m'n ouders\n\n");
-//
-//		for (int i = 0; i < parents.length; i++) {
-//			System.out.println(Arrays.toString(parents[i]));
-//		}
 		for (int i = 0; i < parents.length; i += 2) {
 			double[][] temp_children = create_two_children(childrens[(int) parents[i][1]], childrens[(int) parents[i + 1][1]]);
 			children[i] = temp_children[0];
 			children[i + 1] = temp_children[1];
 		}
-		//			double[][] children = create_two_children(childrens[(int) parents[0][1]], childrens[(int) parents[1][1]]);
 
 		return children;
-
 	}
-
-	public static void writeToFile(String args) {
-		try (FileWriter writer = new FileWriter("test.txt")) {
-			writer.write("Today is a sunny day, koalas, salsa");
-			writer.write("Tobias, geitjes, smoothies");
-			writer.write("GayVBeestje, Stijldansen");
-		} catch (IOException e) {
-			System.out.println(e);
-		}
-	}
-
 
 	public double[][] score_checker( double[][] childrens) {
 
@@ -311,7 +271,6 @@ public class player36 implements ContestSubmission
 				}
 			}
 		}
-
 		return survival_chances;
 
 	}
@@ -343,15 +302,11 @@ public class player36 implements ContestSubmission
 			int boy_index = (int) sorted_survival_chances[i][1];
 			int girl_index = (int) sorted_survival_chances[i + 1][1];
 
-			//System.out.println(Arrays.toString(children[boy_index]));
-
 			// Replace worst ones with boy and girl
 			children[boy_index] = new_children[i];
 			children[girl_index] = new_children[i + 1];
-		//	System.out.println(Arrays.toString(new_children[i]));
 
 		}
-
 		return children;
 
 	}
@@ -408,16 +363,10 @@ public class player36 implements ContestSubmission
 			children[i] = child;
 			// System.out.println(Arrays.toString(children[i]));
 		}
-		// double[] curr_top = new double[] {-1.1891876987039534, 3.802704764222131, -0.7045031488811008, -3.214820204008321, 0.9342012108821499, -1.6280075915460186, 1.1164003795515511, -0.7854278491364934, 1.7478175537980336, -0.45014115827163426};
-		// children[1] = curr_top;
 		return children;
 	}
 
-	// CODE EMMA@@@@@@@@
 	// Creates two children that mirror each other, and together can form their parents.
-
-
-
 	public double[][] create_two_children(double[] mom, double[] dad) {
 		// mom/dad is a parents with 10 genes
 
