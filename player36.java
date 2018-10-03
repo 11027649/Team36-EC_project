@@ -76,6 +76,11 @@ public class player36 implements ContestSubmission
 
 			// function input is the list of n random parents. It secelets 2 parents from the n input parents.
 			double[][] parents = tournamen_parent_selection(10, 10 ,sorted_survival_chances);
+			parents[parents.length-1] = sorted_survival_chances[sorted_survival_chances.length-1];
+			System.out.println("Loopydoopy");
+			for (int p = 0; p < parents.length; p++){
+				System.out.println(Arrays.toString(parents[p]));
+			}
 
 			double[][] new_children = create_n_children(childrens, parents);
 
