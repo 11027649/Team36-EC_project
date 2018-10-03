@@ -84,6 +84,13 @@ public class player36 implements ContestSubmission
 			// Mutate new children.
 			new_children = small_mutation(new_children, amount_mutations);
 
+			// Calculate fitness after mutating.
+			for (int i = 0; i < new_children.size(); i++) {
+				Individual kid = new_children.get(i);
+				double kidFitness = (double) evaluation_.evaluate(kid.genome);
+				evals = kid.setFitness(evals, kidFitness);
+			}
+
 			// Replace worst individuals in population with new kids.
 			population = replace_worst(sorted_population, new_children);
 
@@ -127,10 +134,6 @@ public class player36 implements ContestSubmission
 					kid.genome[j] = kid.genome[j] - r - r;
 				}
 			}
-
-			// Calculate fitness after mutating.
-			double kidFitness = (double) evaluation_.evaluate(kid.genome);
-			evals = kid.setFitness(evals, kidFitness);
 
 			new_kids.set(i, kid);
 		}

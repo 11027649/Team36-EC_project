@@ -1,6 +1,6 @@
 public class Individual {
-   double[] genome = new double[10];
-   double fitness;
+   double[] genome = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+   double fitness = 0;
 
    public int setFitness(int evals, double fitness) {
      this.fitness = fitness;
