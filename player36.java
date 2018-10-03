@@ -92,12 +92,13 @@ public class player36 implements ContestSubmission
 
 			print_average_score(sorted_population);
 		}
+
 	}
 
 	public void print_average_score(ArrayList<Individual> sorted_population) {
 		double total = 0.0;
 
-		for (int i = 0; i < sorted_population.size(); i++){
+		for (int i = 0; i < sorted_population.size(); i++) {
 			total = total + sorted_population.get(i).fitness;
 		}
 
@@ -268,7 +269,6 @@ public class player36 implements ContestSubmission
 
 	// Returns a random double between certain values
 	public double get_random_double(int min, int max) {
-
 		return (Math.random() * (max - min)) + min;
 	}
 
@@ -330,4 +330,5 @@ public class player36 implements ContestSubmission
     	}
     	return false;
 	}
+
 }

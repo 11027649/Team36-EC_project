@@ -12,7 +12,6 @@ total = 0
 maxi = 0
 mini = 10
 
-
 for i in range(0,n):
 	if what_function == 0:
 		java_output = os.popen('java -jar testrun.jar -submission=player36 -evaluation=BentCigarFunction -seed=1').read()
