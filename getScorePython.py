@@ -2,10 +2,10 @@ import os
 
 os.system('javac -cp contest.jar player36.java')
 
-print(" (0) BentCigarFunction \n (1) Schaffers F17 \n (2) Katsuura \n Type your choice: ")
+print(" (0) BentCigarFunction \n (1) Schaffers F17 \n (2) Katsuura \n Type your choice: ", end="")
 what_function = int(input())
 
-n = int(input("How often do you want to run this function? \n "))
+n = int(input("How often do you want to run this function? "))
 
 
 total = 0
@@ -21,11 +21,12 @@ for i in range(0,n):
 	elif what_function == 2:
 		java_output = os.popen('java -jar testrun.jar -submission=player36 -evaluation=KatsuuraEvaluation -seed=1').read()
 	else:
-		print("Dumbass")
+		print("Dumbass, you couldn't complete the task of typing 0, 1 or 2")
 		exit(1);
 
 	score = float(java_output.split('\n')[-3].split(' ')[1])
 	total = total + score
+	print(score)
 	if score > maxi:
 		maxi = score
 	if score < mini:
