@@ -75,7 +75,7 @@ public class player36 implements ContestSubmission
 		while (evals < evaluations_limit_) {
 
 			// function input is the list of n random parents. It secelets 2 parents from the n input parents.
-			double[][] parents = tournamen_parent_selection(10, 2,sorted_survival_chances);
+			double[][] parents = tournamen_parent_selection(10, 10 ,sorted_survival_chances);
 
 			double[][] new_children = create_n_children(childrens, parents);
 
@@ -83,74 +83,42 @@ public class player36 implements ContestSubmission
 			new_children = lil_mutation_function(new_children,10);
 
 			childrens = who_lives_who_dies(sorted_survival_chances, childrens, new_children);
-			// Apply crossover / mutation operators
-
-			// Check fitness of unknown fuction: determines your grade
-			// needs real-value values but conversions before are okay
-			// Double fitness = (double) evaluation_.evaluate(childrens[2]);
-
-			// double avg_fitness = 0;
-			// int best = 0;
-			// double best_value = -100;
-			// for (int i = 0; i < childrens.length; i++) {
-
-			// 	// calculate and save the fitness of this individual
-			// 	Double fitness = (double) evaluation_.evaluate(childrens[i]);
-			// 	avg_fitness += fitness;
-			// 	survival_chances[i][0] = fitness;
-			// 	survival_chances[i][1] = i;
-
-			// 	// save the best individual
-			// 	if (fitness > best_value) {
-			// 		best_value = fitness;
-			// 		best = i;
-			// 	}
-			// 	evals++;
-			// }
 
 			// Sort algorithm from min to max fitness
-			// sorted_survival_chances = sort_survival_chances(survival_chances);
 			sorted_survival_chances = update_new_children_score(sorted_survival_chances, new_children);
 
-			// glb_best = best;
-
+			print_average_score(sorted_survival_chances);
 		}
+	}
+
+	public void print_average_score(double[][] sorted_survival_chances) {
+		double total = 0.0;
+		for (int i = 0; i < sorted_survival_chances.length; i++){
+			total = total + sorted_survival_chances[i][0];
+		}
+		double average = total / sorted_survival_chances.length;
+		System.out.print("avg: ");
+		System.out.println(average);
+		System.out.print("best: ");
+		System.out.println(sorted_survival_chances[sorted_survival_chances.length-1][0]);
 	}
 
 	public double[][] update_new_children_score(double[][] survival_chances, double[][] new_children) {
 
-	for (int i = 0; i < new_children.length; i++) {
-		// Get index of those to replace
-		Double fitness = (double) evaluation_.evaluate(new_children[i]);
-		evals++;
-		survival_chances[i][0] = fitness;
-
-	}
-
-	double sorted_survival_chances[][] = new double[new_children.length][2];
-	sorted_survival_chances = sort_survival_chances(survival_chances);
-	return sorted_survival_chances;
-
-}
-
-	public double[][] mutation_swap_function(double [][] new_kids ) {
-		for (int i = 0; i < new_kids.length; i++){
-			double individual_kid[] = new_kids[i];
-
-			// maak een random getal tussen de 0 en de 9
-			int random_numbers [] = printRandomNumbers(2, 9);
-
-			// swap
-			double temp = individual_kid[random_numbers[0]];
-			individual_kid[random_numbers[0]] = individual_kid[random_numbers[1]];
-			individual_kid[random_numbers[1]] = temp;
-
-			new_kids[i] = individual_kid;
+		for (int i = 0; i < new_children.length; i++) {
+			// Get index of those to replace
+			Double fitness = (double) evaluation_.evaluate(new_children[i]);
+			evals++;
+			survival_chances[i][0] = fitness;
 
 		}
-		// let op ,... een swap is soms geen swao omdat je hetzewlfde getal terug krijgt. dit zou niet mogen.
-		return new_kids;
+
+		double sorted_survival_chances[][] = new double[new_children.length][2];
+		sorted_survival_chances = sort_survival_chances(survival_chances);
+		return sorted_survival_chances;
+
 	}
+
 
 	//	Lil mutation
 	public double[][] lil_mutation_function(double [][] new_kids, int num_of_mutations) {
