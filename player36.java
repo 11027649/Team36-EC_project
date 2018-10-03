@@ -1,6 +1,5 @@
 import org.vu.contest.ContestSubmission;
 import org.vu.contest.ContestEvaluation;
-// import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Random;
 import java.util.Properties;
@@ -12,12 +11,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import java.lang.Math;
-
-import java.awt.Font;
-import java.awt.Color;
-
-import java.io.FileWriter;
-import java.io.IOException;
 
 public class player36 implements ContestSubmission
 {
