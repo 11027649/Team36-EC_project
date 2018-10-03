@@ -80,7 +80,7 @@ public class player36 implements ContestSubmission
 			double[][] new_children = create_n_children(childrens, parents);
 
 //			new_children = mutation_swap_function(new_children);
-			new_children = lil_mutation_function(new_children,1);
+			new_children = lil_mutation_function(new_children,10);
 
 			childrens = who_lives_who_dies(sorted_survival_chances, childrens, new_children);
 			// Apply crossover / mutation operators
@@ -89,32 +89,49 @@ public class player36 implements ContestSubmission
 			// needs real-value values but conversions before are okay
 			// Double fitness = (double) evaluation_.evaluate(childrens[2]);
 
-			double avg_fitness = 0;
-			int best = 0;
-			double best_value = -100;
-			for (int i = 0; i < childrens.length; i++) {
+			// double avg_fitness = 0;
+			// int best = 0;
+			// double best_value = -100;
+			// for (int i = 0; i < childrens.length; i++) {
 
-				// calculate and save the fitness of this individual
-				Double fitness = (double) evaluation_.evaluate(childrens[i]);
-				avg_fitness += fitness;
-				survival_chances[i][0] = fitness;
-				survival_chances[i][1] = i;
+			// 	// calculate and save the fitness of this individual
+			// 	Double fitness = (double) evaluation_.evaluate(childrens[i]);
+			// 	avg_fitness += fitness;
+			// 	survival_chances[i][0] = fitness;
+			// 	survival_chances[i][1] = i;
 
-				// save the best individual
-				if (fitness > best_value) {
-					best_value = fitness;
-					best = i;
-				}
-				evals++;
-			}
+			// 	// save the best individual
+			// 	if (fitness > best_value) {
+			// 		best_value = fitness;
+			// 		best = i;
+			// 	}
+			// 	evals++;
+			// }
 
 			// Sort algorithm from min to max fitness
-			sorted_survival_chances = sort_survival_chances(survival_chances);
+			// sorted_survival_chances = sort_survival_chances(survival_chances);
+			sorted_survival_chances = update_new_children_score(sorted_survival_chances, new_children);
 
-			glb_best = best;
+			// glb_best = best;
 
 		}
 	}
+
+	public double[][] update_new_children_score(double[][] survival_chances, double[][] new_children) {
+
+	for (int i = 0; i < new_children.length; i++) {
+		// Get index of those to replace
+		Double fitness = (double) evaluation_.evaluate(new_children[i]);
+		evals++;
+		survival_chances[i][0] = fitness;
+
+	}
+
+	double sorted_survival_chances[][] = new double[new_children.length][2];
+	sorted_survival_chances = sort_survival_chances(survival_chances);
+	return sorted_survival_chances;
+
+}
 
 	public double[][] mutation_swap_function(double [][] new_kids ) {
 		for (int i = 0; i < new_kids.length; i++){
