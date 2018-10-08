@@ -59,7 +59,7 @@ public class player36 implements ContestSubmission
 		// Run your algorithm here
 
 		int tournament_size = 25;
-		int amount_parents = 2;
+		int amount_parents = 10;
 		int num_of_mutations = 10;
 		int num_of_unchanged_best = 0;
 		int max_of_unchanged_best = 200;
@@ -78,34 +78,55 @@ public class player36 implements ContestSubmission
 
 
 		// Calculate fitness
+		// while (evals < 2000) {
 		while (evals < evaluations_limit_) {
 
 			double old_best_person = sorted_survival_chances[sorted_survival_chances.length -1][0];
-			System.out.println("ouwe beste");
-			System.out.println(old_best_person);
+			// System.out.println("ouwe beste");
+			// System.out.println(old_best_person);
 
 			// function input is the list of n random parents. It secelets 2 parents from the n input parents.
 			double[][] parents = tournament_parent_selection(amount_parents, tournament_size, sorted_survival_chances);
 			parents[parents.length-1] = sorted_survival_chances[sorted_survival_chances.length-1];
-			System.out.println("Loopydoopy");
-			for (int p = 0; p < parents.length; p++){
-				System.out.println(Arrays.toString(parents[p]));
-			}
+
+			// System.out.println("Loopydoopy");
+			// for (int p = 0; p < parents.length; p++){
+			// 	System.out.println(Arrays.toString(parents[p]));
+			// }
 
 			double[][] new_children = create_n_children(childrens, parents);
 
 //			new_children = mutation_swap_function(new_children);
-			new_children = lil_mutation_function(new_children,num_of_mutations);
-
+			if (mutate_big) {
+				// System.out.println("Kiddy kids");
+				// for (int kid = 0; kid < new_children.length; kid++){
+				// System.out.println(Arrays.toString(new_children[0]));
+				// System.out.println(Arrays.toString(new_children[1]));
+				// }
+				new_children = inversion_mutation(new_children);
+				// for (int kid = 0; kid < new_children.length; kid++){
+				// System.out.println(Arrays.toString(new_children[0]));
+				// System.out.println(Arrays.toString(new_children[1]));
+				// }
+			} else {
+				// System.out.println("Kiddy kids");
+				// for (int kid = 0; kid < new_children.length; kid++){
+				// System.out.println(Arrays.toString(new_children[0]));
+				// System.out.println(Arrays.toString(new_children[1]));
+				new_children = lil_mutation_function(new_children, num_of_mutations);
+				// for (int kid = 0; kid < new_children.length; kid++){
+				// System.out.println(Arrays.toString(new_children[0]));
+				// System.out.println(Arrays.toString(new_children[1]));
+			}
 			childrens = who_lives_who_dies(sorted_survival_chances, childrens, new_children);
 
 			// Sort algorithm from min to max fitness
 			sorted_survival_chances = update_new_children_score(sorted_survival_chances, new_children);
 
 
-			System.out.println("nieuwe beste");
+			// System.out.println("nieuwe beste");
 			double new_best_person = sorted_survival_chances[sorted_survival_chances.length-1][0];
-			System.out.println(new_best_person);
+			// System.out.println(new_best_person);
 
 
 			// muteer de beste speler als zijn score niet verandert
@@ -122,6 +143,49 @@ public class player36 implements ContestSubmission
 
 			print_average_score(sorted_survival_chances);
 		}
+	}
+
+	public double[][] inversion_mutation(double [][] new_kids) {
+
+		double individual_kid[] = new double[10];
+
+		for (int i = 0; i < new_kids.length; i++){
+			individual_kid = new_kids[i];
+
+			// create a random digit between 0 and 9
+			int random_numbers [] = printRandomNumbers(2, 9);
+			int begin = random_numbers[0];
+			int end = random_numbers[1];
+			int j;
+
+
+			System.out.println(Arrays.toString(new_kids[i]));
+			System.out.println(begin);
+			System.out.println(end);
+
+			if (begin > end) {
+				j = end;
+				for (j = end; j < (begin - end); j++) {
+						double temp_gen = individual_kid[j];
+						individual_kid[j] = individual_kid[begin - end - j - 1];
+						individual_kid[begin - end - j - 1] = temp_gen;
+				}
+			} else {
+
+				for (j = begin; j < (end - begin); j++) {
+						double temp_gen = individual_kid[j];
+						individual_kid[j] = individual_kid[end - begin - j - 1];
+						individual_kid[end - begin - j - 1] = temp_gen;
+				}
+
+			}
+
+			new_kids[i] = individual_kid;
+			System.out.println(Arrays.toString(new_kids[i]));
+		}
+		// let op... een swap is soms geen swao omdat je hetzewlfde getal terug krijgt. dit zou niet mogen.
+		// System.out.println(new_kids.length);
+		return new_kids;
 	}
 
 	public void print_average_score(double[][] sorted_survival_chances) {
@@ -171,6 +235,7 @@ public class player36 implements ContestSubmission
 			new_kids[i] = individual_kid;
 		}
 		// let op... een swap is soms geen swao omdat je hetzewlfde getal terug krijgt. dit zou niet mogen.
+		// System.out.println(new_kids.length);
 		return new_kids;
 	}
 
@@ -219,11 +284,11 @@ public class player36 implements ContestSubmission
 			parents[i] = select_single_parent(parents_pool);
 
 		}
-		System.out.println("ALLAH HAKBAR");
-		System.out.println(evals);
-		for (int i = 0; i < parents.length; i++) {
-			System.out.println(Arrays.toString(parents[i]));
-		}
+		// System.out.println("ALLAH HAKBAR");
+		// System.out.println(evals);
+		// for (int i = 0; i < parents.length; i++) {
+		// 	System.out.println(Arrays.toString(parents[i]));
+		// }
 
 		return  parents;
 	}
