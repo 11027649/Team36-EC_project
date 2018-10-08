@@ -58,9 +58,15 @@ public class player36 implements ContestSubmission
 	public void run() {
 		// Run your algorithm here
 
+		int tournament_size = 25;
+		int amount_parents = 2;
+		int num_of_mutations = 10;
+		int num_of_unchanged_best = 0;
+		int max_of_unchanged_best = 200;
+		boolean mutate_big = false;
+
 		// Create population of 100 ppl, each person has 10 gens
 		double childrens[][] = create_population();
-		int glb_best = 0;
 
 		// Determine fitness for each child in population
 		double survival_chances[][] = score_checker(childrens);
@@ -68,14 +74,18 @@ public class player36 implements ContestSubmission
 		// sort algorithm that sorts the children on fitness from min to max
 		double sorted_survival_chances[][] = sort_survival_chances(survival_chances);
 
-		// Amount of random elements from population
-		int n = 5;
+		
+
 
 		// Calculate fitness
 		while (evals < evaluations_limit_) {
 
+			double old_best_person = sorted_survival_chances[sorted_survival_chances.length -1][0];
+			System.out.println("ouwe beste");
+			System.out.println(old_best_person);
+
 			// function input is the list of n random parents. It secelets 2 parents from the n input parents.
-			double[][] parents = tournamen_parent_selection(10, 10 ,sorted_survival_chances);
+			double[][] parents = tournament_parent_selection(amount_parents, tournament_size, sorted_survival_chances);
 			parents[parents.length-1] = sorted_survival_chances[sorted_survival_chances.length-1];
 			System.out.println("Loopydoopy");
 			for (int p = 0; p < parents.length; p++){
@@ -85,12 +95,30 @@ public class player36 implements ContestSubmission
 			double[][] new_children = create_n_children(childrens, parents);
 
 //			new_children = mutation_swap_function(new_children);
-			new_children = lil_mutation_function(new_children,10);
+			new_children = lil_mutation_function(new_children,num_of_mutations);
 
 			childrens = who_lives_who_dies(sorted_survival_chances, childrens, new_children);
 
 			// Sort algorithm from min to max fitness
 			sorted_survival_chances = update_new_children_score(sorted_survival_chances, new_children);
+
+
+			System.out.println("nieuwe beste");
+			double new_best_person = sorted_survival_chances[sorted_survival_chances.length-1][0];
+			System.out.println(new_best_person);
+
+
+			// muteer de beste speler als zijn score niet verandert
+			if (new_best_person == old_best_person) {
+				num_of_unchanged_best ++;
+				if (num_of_unchanged_best == max_of_unchanged_best){
+					mutate_big = true;
+				}
+			} else {
+				num_of_unchanged_best = 0;
+				mutate_big = false;
+			}
+			
 
 			print_average_score(sorted_survival_chances);
 		}
@@ -180,7 +208,7 @@ public class player36 implements ContestSubmission
 		return parent;
 	}
 
-	public double[][] tournamen_parent_selection(int amount_of_parents, int n, double[][] sorted_survival_chances) {
+	public double[][] tournament_parent_selection(int amount_of_parents, int n, double[][] sorted_survival_chances) {
 		// amount of parents is how many parents should be selected to make
 		// the same number of children. two parents make two children. chidlren have max two paretns.
 		// n = how large the pool of randomly selected elements that will form the parents should be.
