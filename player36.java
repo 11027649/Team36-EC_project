@@ -34,10 +34,10 @@ public class player36 implements ContestSubmission
 	public void setEvaluation(ContestEvaluation evaluation)
 	{
 		// Set evaluation problem used in the run
-		evaluation_ = evaluation;
+			evaluation_ = evaluation;
 
-		// Get evaluation properties
-		Properties props = evaluation.getProperties();
+			// Get evaluation properties
+			Properties props = evaluation.getProperties();
 	    // Get evaluation limit
 	    evaluations_limit_ = Integer.parseInt(props.getProperty("Evaluations"));
 
@@ -57,168 +57,220 @@ public class player36 implements ContestSubmission
 
 	public void run() {
 		// Run your algorithm here
-		int dimensions = 10;
-		int pop_size = 100;
 
-		int amount_parents = 10;
-		int tournament_size = 10;
+		// Create population of 100 ppl, each person has 10 gens
+		double childrens[][] = create_population();
+		int glb_best = 0;
 
-		int amount_mutations = 10;
+		// Determine fitness for each child in population
+		double survival_chances[][] = score_checker(childrens);
 
-		// Create population of 100 ppl, each person has 10 genes
-		ArrayList<Individual> population = create_population(dimensions, pop_size);
+		// sort algorithm that sorts the children on fitness from min to max
+		double sorted_survival_chances[][] = sort_survival_chances(survival_chances);
 
-		// Sort algorithm that sorts the children on fitness from min to max
-		ArrayList<Individual> sorted_population = sort_arraylist(population);
+		// Amount of random elements from population
+		int n = 5;
 
-		// while (evals < evaluations_limit_) {
-		while (evals < 400) {
+		// Calculate fitness
+		while (evals < evaluations_limit_) {
 
-			// function returns the best paretns from tournament parents selection
-			ArrayList<Individual> parents = tournament_parent_selection(amount_parents, tournament_size, sorted_population);
-
-			// Best individual will be a parent.
-			// parents.add(sorted_population.get(sorted_population.size() - 1));
-
-
-			// create new children
-			ArrayList<Individual> new_children = create_n_children(population, parents);
-			System.out.println(new_children);
-
-
-			// Mutate new children.
-			new_children = small_mutation(new_children, amount_mutations);
-
-			// Calculate fitness after mutating.
-			for (int i = 0; i < new_children.size(); i++) {
-				Individual kid = new_children.get(i);
-				double kidFitness = (double) evaluation_.evaluate(kid.genome);
-				evals = kid.setFitness(evals, kidFitness);
+			// function input is the list of n random parents. It secelets 2 parents from the n input parents.
+			double[][] parents = tournamen_parent_selection(10, 10 ,sorted_survival_chances);
+			parents[parents.length-1] = sorted_survival_chances[sorted_survival_chances.length-1];
+			System.out.println("Loopydoopy");
+			for (int p = 0; p < parents.length; p++){
+				System.out.println(Arrays.toString(parents[p]));
 			}
 
-			// Replace worst individuals in population with new kids.
-			population = replace_worst(sorted_population, new_children);
+			double[][] new_children = create_n_children(childrens, parents);
 
-			// Sort population again (with new children).
-			sorted_population = sort_arraylist(population);
+//			new_children = mutation_swap_function(new_children);
+			new_children = lil_mutation_function(new_children,10);
 
-			print_average_score(sorted_population);
+			childrens = who_lives_who_dies(sorted_survival_chances, childrens, new_children);
+
+			// Sort algorithm from min to max fitness
+			sorted_survival_chances = update_new_children_score(sorted_survival_chances, new_children);
+
+			print_average_score(sorted_survival_chances);
 		}
-
 	}
 
-	public void print_average_score(ArrayList<Individual> sorted_population) {
+	public void print_average_score(double[][] sorted_survival_chances) {
 		double total = 0.0;
-
-		for (int i = 0; i < sorted_population.size(); i++) {
-			total = total + sorted_population.get(i).fitness;
+		for (int i = 0; i < sorted_survival_chances.length; i++){
+			total = total + sorted_survival_chances[i][0];
 		}
-
-		double average = total / sorted_population.size();
-
+		double average = total / sorted_survival_chances.length;
 		System.out.print("avg: ");
 		System.out.println(average);
 		System.out.print("best: ");
-		System.out.println(sorted_population.get(sorted_population.size() - 1).fitness);
+		System.out.println(sorted_survival_chances[sorted_survival_chances.length-1][0]);
 	}
 
-	public ArrayList<Individual> small_mutation(ArrayList<Individual> new_kids, int num_of_mutations) {
+	public double[][] update_new_children_score(double[][] survival_chances, double[][] new_children) {
 
-		for (int i = 0; i < new_kids.size(); i++){
-			Individual kid = new_kids.get(i);
+		for (int i = 0; i < new_children.length; i++) {
+			// Get index of those to replace
+			Double fitness = (double) evaluation_.evaluate(new_children[i]);
+			evals++;
+			survival_chances[i][0] = fitness;
+
+		}
+
+		double sorted_survival_chances[][] = new double[new_children.length][2];
+		sorted_survival_chances = sort_survival_chances(survival_chances);
+		return sorted_survival_chances;
+
+	}
+
+
+	//	Lil mutation
+	public double[][] lil_mutation_function(double [][] new_kids, int num_of_mutations) {
+		for (int i = 0; i < new_kids.length; i++){
+			double individual_kid[] = new_kids[i];
 
 			// create a random digit between 0 and 9
 			int random_numbers [] = printRandomNumbers(num_of_mutations, 9);
 
 			for (int j = 0; j < random_numbers.length; j++) {
 				double r = get_random_double(-1,1);
-
-				kid.genome[j] = kid.genome[j] + r;
-
-				if (kid.genome[j] > 5 || kid.genome[j] < -5) {
-					kid.genome[j] = kid.genome[j] - r - r;
+				individual_kid[j] = individual_kid[j] + r;
+				if (individual_kid[j] > 5 || individual_kid[j] < -5) {
+					individual_kid[j] = individual_kid[j] - r - r;
 				}
 			}
-
-			new_kids.set(i, kid);
+			new_kids[i] = individual_kid;
 		}
-
-		// Swappen kan met hetzelfde kid.
+		// let op... een swap is soms geen swao omdat je hetzewlfde getal terug krijgt. dit zou niet mogen.
 		return new_kids;
 	}
 
-	public ArrayList<Individual> select_candidates(int amount_candidates, ArrayList<Individual> sorted_population) {
+
+	//
+	public double[][] select_n_random_elements(int n, double[][] sort_list) {
 
 		// Select n random integers between zero and a maximum value.
-		int random_numbers[] = printRandomNumbers(amount_candidates,99);
+		int random_number_list[] = printRandomNumbers(n,99);
 
-		ArrayList<Individual> candidates = new ArrayList<Individual>();
+		double random_n_elements[][] = new double[n][];
 
-		// Save the n random candidates.
-		for (int i = 0; i < random_numbers.length; i++) {
-			int index_number = random_numbers[i];
-			candidates.add(sorted_population.get(index_number));
+		// Save the n random elements
+		for (int i = 0; i < random_number_list.length; i++) {
+
+			// Put the index number in a variable
+			int index_number = random_number_list[i];
+			random_n_elements[i] = sort_list[index_number];
 		}
-
-		return candidates;
+		return random_n_elements;
 	}
 
-	public Individual select_single_parent(ArrayList<Individual> parents_pool) {
-		ArrayList<Individual> sorted = sort_arraylist(parents_pool);
-		Individual best_parent = sorted.get(parents_pool.size() - 1);
+	public double[][] select_parents(double[][] random_n_elements) {
 
-		return best_parent;
+		double[][] parents = new double[2][2];
+		double[][] sorted = sort_survival_chances(random_n_elements);
+		parents[0] = sorted[random_n_elements.length - 1];
+		parents[1] = sorted[random_n_elements.length - 2];
+		return parents;
 	}
 
-	public ArrayList<Individual> tournament_parent_selection(int amount_of_parents, int tournament_size, ArrayList<Individual> sorted_population) {
-		
-		ArrayList<Individual> parents = new ArrayList<Individual>();
+	public double[] select_single_parent(double[][] random_n_elements) {
+		double[][] sorted = sort_survival_chances(random_n_elements);
+		double[] parent = sorted[random_n_elements.length - 1];
+		return parent;
+	}
 
+	public double[][] tournamen_parent_selection(int amount_of_parents, int n, double[][] sorted_survival_chances) {
+		// amount of parents is how many parents should be selected to make
+		// the same number of children. two parents make two children. chidlren have max two paretns.
+		// n = how large the pool of randomly selected elements that will form the parents should be.
+
+		double[][] parents = new double[amount_of_parents][2];
 		for (int i = 0; i < amount_of_parents; i++) {
+			double[][] parents_pool = select_n_random_elements(n, sorted_survival_chances);
+			parents[i] = select_single_parent(parents_pool);
 
-			// select random x amount of parents from the population
-			ArrayList<Individual> parents_pool = select_candidates(tournament_size, sorted_population);
-
-
-			// selects the best parent from the parents_pool
-			parents.add(select_single_parent(parents_pool));
 		}
-
-//		String s = "Amount of evals: " + evals;
-//		System.out.println(s);
+		System.out.println("ALLAH HAKBAR");
+		System.out.println(evals);
+		for (int i = 0; i < parents.length; i++) {
+			System.out.println(Arrays.toString(parents[i]));
+		}
 
 		return  parents;
 	}
 
-	public ArrayList<Individual> create_n_children(ArrayList<Individual> population, ArrayList<Individual> parents) {
-		ArrayList<Individual> children = new ArrayList<Individual>();
+	public double[][] create_n_children(double[][] childrens, double[][] parents) {
+		double[][] children = new double[parents.length][10];
 
-		for (int i = 0; i < parents.size(); i += 2) {
-
-			ArrayList<Individual> temp_children = create_two_children(parents.get(i), parents.get(i + 1));
-			children.add(temp_children.get(0));
-			children.add(temp_children.get(1));
-
+		for (int i = 0; i < parents.length; i += 2) {
+			double[][] temp_children = create_two_children(childrens[(int) parents[i][1]], childrens[(int) parents[i + 1][1]]);
+			children[i] = temp_children[0];
+			children[i + 1] = temp_children[1];
 		}
 
 		return children;
 	}
 
-	public ArrayList<Individual> sort_arraylist(ArrayList<Individual> population) {
+	public double[][] score_checker( double[][] childrens) {
+
+		// in this array we place the score and index
+
+		double fitness_index_array[][] = new double[childrens.length][];
+
+		for (int i = 0; i < childrens.length; i++) {
+
+			double fit_index_array[] = new double [2];
+
+			// calculate and save the fitness of this individual
+			double fitness = (double) evaluation_.evaluate(childrens[i]);
+
+			// on the ith array at the left side, place the fitness
+			fit_index_array[0] = fitness;
+
+			// on the ith array at the right side, place the index number
+			fit_index_array[1] = i;
+
+			// place the array in the big array
+			fitness_index_array[i] = fit_index_array;
+
+			evals++;
+		}
+
+		return fitness_index_array;
+	}
+
+	// TODO write better sorting algorithm
+	public double[][] sort_survival_chances(double[][] survival_chances) {
 		// sort algorithm that sorts the children on fitness from min to max
 
-		Individual temp_child = new Individual();
-
-		for (int n = 0; n < population.size(); n++) {
-			for (int m = 0; m < population.size(); m++){
-				if (population.get(n).fitness < population.get(m).fitness) {
-					temp_child = population.get(n);
-					population.set(n, population.get(m));
-					population.set(m, temp_child);
+		double temp[] = new double[2];
+		for (int n = 0; n < survival_chances.length; n++) {
+			for (int m = 0; m < survival_chances.length; m++){
+				if (survival_chances[n][0] < survival_chances[m][0]) {
+					temp = survival_chances[n];
+					survival_chances[n] = survival_chances[m];
+					survival_chances[m] = temp;
 				}
 			}
 		}
-		return population;
+		return survival_chances;
+
+	}
+
+	public double[] make_half_half_child(double[] mom, double[] dad) {
+
+		double[] child = new double[10];
+
+		for (int i = 0; i < mom.length; i++) {
+			if (i < mom.length / 2) {
+				child[i] = mom[i];
+			} else {
+				child[i] = dad[i];
+			}
+		}
+
+		return child;
 	}
 
 	// TODO write function with DNA library
@@ -226,15 +278,20 @@ public class player36 implements ContestSubmission
 	// TODO write function who lives, who dies, who tells your story
 	// Slechtste twee per rondje gaan dood (want komen er twee bij)
 
-	public ArrayList<Individual> replace_worst(ArrayList<Individual> population, ArrayList<Individual> new_children) {
+	public double[][] who_lives_who_dies(double[][] sorted_survival_chances, double[][] children, double[][] new_children) {
 
-		for (int i = 0; i < new_children.size(); i++) {
-
+		for (int i = 0; i < new_children.length; i += 2) {
 			// Get index of those to replace
-			population.set(i, new_children.get(i));
-		}
+			int boy_index = (int) sorted_survival_chances[i][1];
+			int girl_index = (int) sorted_survival_chances[i + 1][1];
 
-		return population;
+			// Replace worst ones with boy and girl
+			children[boy_index] = new_children[i];
+			children[girl_index] = new_children[i + 1];
+
+		}
+		return children;
+
 	}
 
 	// This is a function that generates random numbers between a range, without repetition
@@ -264,57 +321,62 @@ public class player36 implements ContestSubmission
 
 	// Returns a random double between certain values
 	public double get_random_double(int min, int max) {
+
 		return (Math.random() * (max - min)) + min;
 	}
 
 	// This is a function that initializes the population with random individuals
-	public ArrayList<Individual> create_population(int dimensions, int pop_size) {
+	public double[][] create_population() {
 
-		ArrayList<Individual> population = new ArrayList<Individual>();
+		// define population size 100 people with each person has 10 gens
+		int pop_size = 100;
+		int dim = 10;
+
+		double children[][] = new double[pop_size][];
 
 		// initialize population randomly
 		for (int i = 0; i < pop_size; i++) {
-			Individual child = new Individual();
+			double child[] = new double[dim];
 
-			for (int j = 0; j < dimensions; j++) {
+			for (int j = 0; j < dim; j++) {
 				double random_double = get_random_double(-5, 5);
-				child.genome[j] = random_double;
+				child[j] = random_double;
 
 			}
-			double childFitness = (double) evaluation_.evaluate(child.genome);
-			evals = child.setFitness(evals, childFitness);
-
-			population.add(child);
+			children[i] = child;
+			// System.out.println(Arrays.toString(children[i]));
 		}
-		return population;
+		return children;
 	}
 
 	// Creates two children that mirror each other, and together can form their parents.
-	public ArrayList<Individual> create_two_children(Individual mom, Individual dad) {
+	public double[][] create_two_children(double[] mom, double[] dad) {
 		// mom/dad is a parents with 10 genes
 
 		// make 10 places per child for the genes
-    	Individual boy = new Individual();
-	    Individual girl = new Individual();
+    	double[] boy = new double[10];
+	    double[] girl = new double[10];
+
 
 	    // make 5 int in an array from 0 - 9
 	    int[] parent_indices = printRandomNumbers(5, 9);
+	    // System.out.println(Arrays.toString(parent_indices));
 
-	    for (int i = 0; i < parent_indices.length; i++) {
+	    for (int i = 0; i < mom.length; i++) {
 	       if (in_parent_indices(parent_indices, i)) {
-	          boy.genome[i] = mom.genome[i];
-	          girl.genome[i] = dad.genome[i];
+	          boy[i] = mom[i];
+	          girl[i] = dad[i];
 	       } else {
-	          boy.genome[i] = dad.genome[i];
-	          girl.genome[i] = mom.genome[i];
+	          boy[i] = dad[i];
+	          girl[i] = mom[i];
 	       }
 	    }
 	  	// In order to return two lists, make them into one list.
 		// IMPORTANT: must take two lists apart again!!!
-		ArrayList<Individual> children = new ArrayList<Individual>();
-		children.add(boy);
-		children.add(girl);
-	  return children;
+		double[][] boygirl = new double[2][10];
+	   	boygirl[0] = boy;
+	   	boygirl[1] = girl;
+	   	return boygirl;
 	}
 
 	public boolean in_parent_indices(int[] parent_indices, int n) {
@@ -325,5 +387,4 @@ public class player36 implements ContestSubmission
     	}
     	return false;
 	}
-
 }
