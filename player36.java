@@ -34,10 +34,10 @@ public class player36 implements ContestSubmission
 	public void setEvaluation(ContestEvaluation evaluation)
 	{
 		// Set evaluation problem used in the run
-			evaluation_ = evaluation;
+		evaluation_ = evaluation;
 
-			// Get evaluation properties
-			Properties props = evaluation.getProperties();
+		// Get evaluation properties
+		Properties props = evaluation.getProperties();
 	    // Get evaluation limit
 	    evaluations_limit_ = Integer.parseInt(props.getProperty("Evaluations"));
 
@@ -61,7 +61,7 @@ public class player36 implements ContestSubmission
 		int pop_size = 100;
 
 		int amount_parents = 10;
-		int parent_candidates = 10;
+		int tournament_size = 10;
 
 		int amount_mutations = 10;
 
@@ -71,15 +71,20 @@ public class player36 implements ContestSubmission
 		// Sort algorithm that sorts the children on fitness from min to max
 		ArrayList<Individual> sorted_population = sort_arraylist(population);
 
-		while (evals < evaluations_limit_) {
+		// while (evals < evaluations_limit_) {
+		while (evals < 400) {
 
-			// function input is the list of n random parents. It selects 2 parents from the n input parents.
-			ArrayList<Individual> parents = tournament_parent_selection(amount_parents, parent_candidates, sorted_population);
+			// function returns the best paretns from tournament parents selection
+			ArrayList<Individual> parents = tournament_parent_selection(amount_parents, tournament_size, sorted_population);
 
 			// Best individual will be a parent.
 			// parents.add(sorted_population.get(sorted_population.size() - 1));
 
+
+			// create new children
 			ArrayList<Individual> new_children = create_n_children(population, parents);
+			System.out.println(new_children);
+
 
 			// Mutate new children.
 			new_children = small_mutation(new_children, amount_mutations);
@@ -165,15 +170,17 @@ public class player36 implements ContestSubmission
 		return best_parent;
 	}
 
-	public ArrayList<Individual> tournament_parent_selection(int amount_of_parents, int candidates_drawn, ArrayList<Individual> sorted_population) {
-		// amount of parents is how many parents should be selected to make
-		// the same number of children. two parents make two children. chidlren have max two paretns.
-		// n = how large the pool of randomly selected elements that will form the parents should be.
-
+	public ArrayList<Individual> tournament_parent_selection(int amount_of_parents, int tournament_size, ArrayList<Individual> sorted_population) {
+		
 		ArrayList<Individual> parents = new ArrayList<Individual>();
 
 		for (int i = 0; i < amount_of_parents; i++) {
-			ArrayList<Individual> parents_pool = select_candidates(candidates_drawn, sorted_population);
+
+			// select random x amount of parents from the population
+			ArrayList<Individual> parents_pool = select_candidates(tournament_size, sorted_population);
+
+
+			// selects the best parent from the parents_pool
 			parents.add(select_single_parent(parents_pool));
 		}
 
@@ -212,21 +219,6 @@ public class player36 implements ContestSubmission
 			}
 		}
 		return population;
-	}
-
-	public double[] make_half_half_child(double[] mom, double[] dad) {
-
-		double[] child = new double[10];
-
-		for (int i = 0; i < mom.length; i++) {
-			if (i < mom.length / 2) {
-				child[i] = mom[i];
-			} else {
-				child[i] = dad[i];
-			}
-		}
-
-		return child;
 	}
 
 	// TODO write function with DNA library
