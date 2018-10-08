@@ -103,7 +103,12 @@ public class player36 implements ContestSubmission
 				// System.out.println(Arrays.toString(new_children[0]));
 				// System.out.println(Arrays.toString(new_children[1]));
 				// }
-				new_children = inversion_mutation(new_children);
+				double chance = get_random_double(0, 1);
+				if (chance < 0.5) {
+					new_children = inversion_mutation(new_children);
+				} else {
+					new_children = insertion_mutation(new_children);
+				}
 				// for (int kid = 0; kid < new_children.length; kid++){
 				// System.out.println(Arrays.toString(new_children[0]));
 				// System.out.println(Arrays.toString(new_children[1]));
@@ -158,10 +163,10 @@ public class player36 implements ContestSubmission
 			int end = random_numbers[1];
 			int j;
 
-
-			System.out.println(Arrays.toString(new_kids[i]));
-			System.out.println(begin);
-			System.out.println(end);
+//
+//			System.out.println(Arrays.toString(new_kids[i]));
+//			System.out.println(begin);
+//			System.out.println(end);
 			// System.out.println("lets go shaun");
 
 			if (begin > end) {
@@ -187,12 +192,41 @@ public class player36 implements ContestSubmission
 			}
 
 			new_kids[i] = individual_kid;
-			System.out.println(Arrays.toString(new_kids[i]));
-			System.out.println("\n\n");
+//			System.out.println(Arrays.toString(new_kids[i]));
+//			System.out.println("\n\n");
 		}
 		// let op... een swap is soms geen swao omdat je hetzewlfde getal terug krijgt. dit zou niet mogen.
 		// System.out.println(new_kids.length);
 		return new_kids;
+	}
+
+	public double[][] insertion_mutation(double[][] new_children) {
+
+		for (int i = 0; i < new_children.length; i++) {
+			int[] indices = printRandomNumbers(2, 9);
+			if (indices[0] > indices[1]) {
+				int temp = indices[0];
+				indices[0] = indices[1];
+				indices[1] = temp;
+			}
+
+			double[] backup = new double[new_children[i].length];
+			for (int j = 0; j < new_children[i].length; j++) {
+				backup[j] = new_children[i][j];
+			}
+
+			new_children[i][indices[0] + 1] = new_children[i][indices[1]];
+
+			for (int j = indices[0] + 2; j < new_children[i].length; j++) {
+				if (i > indices[1]) {
+					new_children[i][j] = backup[j];
+				} else {
+					new_children[i][j] = backup[j - 1];
+				}
+			}
+		}
+
+		return new_children;
 	}
 
 	public void print_average_score(double[][] sorted_survival_chances) {
