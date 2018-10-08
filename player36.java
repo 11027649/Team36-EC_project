@@ -162,26 +162,33 @@ public class player36 implements ContestSubmission
 			System.out.println(Arrays.toString(new_kids[i]));
 			System.out.println(begin);
 			System.out.println(end);
+			// System.out.println("lets go shaun");
 
 			if (begin > end) {
-				j = end;
-				for (j = end; j < (begin - end); j++) {
-						double temp_gen = individual_kid[j];
-						individual_kid[j] = individual_kid[begin - end - j - 1];
-						individual_kid[begin - end - j - 1] = temp_gen;
+				// j = end;
+				for (j = end; j < Math.ceil((begin + end + 1) / 2); j++) {
+					// System.out.print(j);
+					// System.out.println(begin - j + end);
+					double temp_gen = individual_kid[j];
+					individual_kid[j] = individual_kid[begin - j + end];
+					individual_kid[begin - j + end] = temp_gen;
+
+					// System.out.println(Arrays.toString(individual_kid));
 				}
 			} else {
-
-				for (j = begin; j < (end - begin); j++) {
-						double temp_gen = individual_kid[j];
-						individual_kid[j] = individual_kid[end - begin - j - 1];
-						individual_kid[end - begin - j - 1] = temp_gen;
+				for (j = begin; j < Math.ceil((begin + end + 1) / 2); j++) {
+					// System.out.print(j);
+					// System.out.println(end - j + begin);
+					double temp_gen = individual_kid[j];
+					individual_kid[j] = individual_kid[end - j + begin];
+					individual_kid[end - j + begin] = temp_gen;
 				}
 
 			}
 
 			new_kids[i] = individual_kid;
 			System.out.println(Arrays.toString(new_kids[i]));
+			System.out.println("\n\n");
 		}
 		// let op... een swap is soms geen swao omdat je hetzewlfde getal terug krijgt. dit zou niet mogen.
 		// System.out.println(new_kids.length);
