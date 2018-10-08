@@ -184,8 +184,8 @@ public class player36 implements ContestSubmission
 			parents.add(select_single_parent(parents_pool));
 		}
 
-		String s = "Amount of evals: " + evals;
-		System.out.println(s);
+//		String s = "Amount of evals: " + evals;
+//		System.out.println(s);
 
 		return  parents;
 	}
