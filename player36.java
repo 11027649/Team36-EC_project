@@ -25,6 +25,7 @@ public class player36 implements ContestSubmission
 	int num_of_unchanged_best;
 	int max_of_unchanged_best;
 	boolean mutate_big;
+	boolean multiple_parents;
 
 	public player36()
 	{
@@ -61,20 +62,28 @@ public class player36 implements ContestSubmission
 	    if (bentCigar) {
 				population_size = 100;
 				tournament_size = 25;
-				amount_parents = 10;
 				num_of_mutations = 10;
 				num_of_unchanged_best = 0;
 				max_of_unchanged_best = 200;
 				mutate_big = false;
+
+				// 3 parents (more efficient evolution?)
+				multiple_parents = true;
+
+				// if multiple parents = true, the amount of parents must be in the table of 3, else, it must be even
+				amount_parents = 9;
 			}
 			else if (schaffers) {
 				population_size = 100;
 				tournament_size = 25;
-				amount_parents = 10;
+
 				num_of_mutations = 10;
 				num_of_unchanged_best = 0;
 				max_of_unchanged_best = 200;
 				mutate_big = false;
+
+				multiple_parents = true;
+				amount_parents = 9;
 			}
 			else if (katsuura) {
 				population_size = 250;
@@ -84,31 +93,41 @@ public class player36 implements ContestSubmission
 				num_of_unchanged_best = 0;
 				max_of_unchanged_best = 200;
 				mutate_big = false;
+
+				multiple_parents = false;
 			}
     }
 
 	public void run() {
 
 		// Create population of 100 ppl, each person has 10 gens
-		double childrens[][] = create_population(population_size);
+		double population[][] = create_population(population_size);
 
 		// Determine fitness for each child in population
-		double survival_chances[][] = score_checker(childrens);
+		double survival_chances[][] = score_checker(population);
 
 		// sort algorithm that sorts the children on fitness from min to max
 		double sorted_survival_chances[][] = sort_survival_chances(survival_chances);
 
 		// Calculate fitness
 		// while (evals < 2000) {
+		System.out.println(evaluations_limit_);
+
 		while (evals < evaluations_limit_) {
 
 			double old_best_person = sorted_survival_chances[sorted_survival_chances.length -1][0];
 
-			// function input is the list of n random parents. It secelets 2 parents from the n input parents.
+			// function input is the list of n random parents. It selects 2 parents from the n input parents.
 			double[][] parents = tournament_parent_selection(amount_parents, tournament_size, sorted_survival_chances);
 			parents[parents.length-1] = sorted_survival_chances[sorted_survival_chances.length-1];
 
-			double[][] new_children = create_n_children(childrens, parents);
+			double[][] new_children;
+
+			if (multiple_parents) {
+				new_children = create_children_from_multiple_parents(population, parents);
+			} else {
+				new_children = create_n_children(population, parents);
+			}
 
 			if (mutate_big) {
 
@@ -121,14 +140,15 @@ public class player36 implements ContestSubmission
 			} else {
 				new_children = small_mutation(new_children, num_of_mutations);
 			}
-			childrens = survivor_selection(sorted_survival_chances, childrens, new_children);
+			population = survivor_selection(sorted_survival_chances, population, new_children);
 
 			// Sort algorithm from min to max fitness
 			sorted_survival_chances = update_new_children_score(sorted_survival_chances, new_children);
+			System.out.println(evals);
 
 			double new_best_person = sorted_survival_chances[sorted_survival_chances.length-1][0];
 
-			// muteer de beste speler als zijn score niet verandert
+			// If there's no new best score for "num_of_unchanged_best", perform bigger mutations on the children
 			if (new_best_person == old_best_person) {
 				num_of_unchanged_best ++;
 				if (num_of_unchanged_best == max_of_unchanged_best){
@@ -142,6 +162,21 @@ public class player36 implements ContestSubmission
 
 			print_average_score(sorted_survival_chances);
 		}
+	}
+
+	public double[][] create_children_from_multiple_parents(double[][] population, double[][] parents) {
+		double[][] children = new double[parents.length][10];
+
+		for (int i = 0; i < parents.length; i += 3) {
+			double[][] temp_children = create_three_children(population[(int) parents[i][1]],
+																												population[(int) parents[i + 1][1]],
+																												population[(int) parents[i + 2][1]]);
+			children[i] = temp_children[0];
+			children[i + 1] = temp_children[1];
+			children[i + 2] = temp_children[2];
+		}
+
+		return children;
 	}
 
 	public double[][] inversion_mutation(double [][] new_kids) {
@@ -297,11 +332,11 @@ public class player36 implements ContestSubmission
 		return  parents;
 	}
 
-	public double[][] create_n_children(double[][] childrens, double[][] parents) {
+	public double[][] create_n_children(double[][] population, double[][] parents) {
 		double[][] children = new double[parents.length][10];
 
 		for (int i = 0; i < parents.length; i += 2) {
-			double[][] temp_children = create_two_children(childrens[(int) parents[i][1]], childrens[(int) parents[i + 1][1]]);
+			double[][] temp_children = create_two_children(population[(int) parents[i][1]], population[(int) parents[i + 1][1]]);
 			children[i] = temp_children[0];
 			children[i + 1] = temp_children[1];
 		}
@@ -309,18 +344,18 @@ public class player36 implements ContestSubmission
 		return children;
 	}
 
-	public double[][] score_checker( double[][] childrens) {
+	public double[][] score_checker( double[][] population) {
 
 		// in this array we place the score and index
 
-		double fitness_index_array[][] = new double[childrens.length][];
+		double fitness_index_array[][] = new double[population.length][];
 
-		for (int i = 0; i < childrens.length; i++) {
+		for (int i = 0; i < population.length; i++) {
 
 			double fit_index_array[] = new double [2];
 
 			// calculate and save the fitness of this individual
-			double fitness = (double) evaluation_.evaluate(childrens[i]);
+			double fitness = (double) evaluation_.evaluate(population[i]);
 
 			// on the ith array at the left side, place the fitness
 			fit_index_array[0] = fitness;
@@ -355,16 +390,27 @@ public class player36 implements ContestSubmission
 	}
 
 	public double[][] survivor_selection(double[][] sorted_survival_chances, double[][] children, double[][] new_children) {
+		if (multiple_parents) {
+			for (int i = 0; i < new_children.length; i += 3) {
+				// Get index of those to replace
+				int kid1 = (int) sorted_survival_chances[i][1];
+				int kid2 = (int) sorted_survival_chances[i + 1][1];
+				int kid3 = (int) sorted_survival_chances[i + 2][1];
+				// Replace worst ones with boy and girl
+				children[kid1] = new_children[i];
+				children[kid2] = new_children[i + 1];
+				children[kid3] = new_children[i + 2];
+			}
+		} else {
+			for (int i = 0; i < new_children.length; i += 2) {
+				// Get index of those to replace
+				int boy_index = (int) sorted_survival_chances[i][1];
+				int girl_index = (int) sorted_survival_chances[i + 1][1];
 
-		for (int i = 0; i < new_children.length; i += 2) {
-			// Get index of those to replace
-			int boy_index = (int) sorted_survival_chances[i][1];
-			int girl_index = (int) sorted_survival_chances[i + 1][1];
-
-			// Replace worst ones with boy and girl
-			children[boy_index] = new_children[i];
-			children[girl_index] = new_children[i + 1];
-
+				// Replace worst ones with boy and girl
+				children[boy_index] = new_children[i];
+				children[girl_index] = new_children[i + 1];
+			}
 		}
 		return children;
 
@@ -430,7 +476,6 @@ public class player36 implements ContestSubmission
     	double[] boy = new double[10];
 	    double[] girl = new double[10];
 
-
 	    // make 5 int in an array from 0 - 9
 	    int[] parent_indices = printRandomNumbers(5, 9);
 	    // System.out.println(Arrays.toString(parent_indices));
@@ -450,6 +495,28 @@ public class player36 implements ContestSubmission
 	   	boygirl[0] = boy;
 	   	boygirl[1] = girl;
 	   	return boygirl;
+	}
+
+	public double[][] create_three_children(double[] parent1, double[] parent2, double[] parent3) {
+		// make children array for 3 kids with 10 alleles
+		double[][] children = new double[3][10];
+
+		for (int i = 0; i < 3; i ++) {
+				double[] kid = new double[10];
+				int[] indices = printRandomNumbers(10,9);
+
+				for (int j = 0; j < 10; j ++) {
+					if (j < 4) {
+							kid[indices[j]] = parent1[indices[j]];
+					} else if (j < 7) {
+						kid[indices[j]] = parent2[indices[j]];
+					} else {
+						kid[indices[j]] = parent3[indices[j]];
+					}
+				}
+				children[i] = kid;
+		}
+		return children;
 	}
 
 	public boolean in_parent_indices(int[] parent_indices, int n) {
