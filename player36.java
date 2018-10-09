@@ -88,13 +88,14 @@ public class player36 implements ContestSubmission
 			else if (katsuura) {
 				population_size = 250;
 				tournament_size = 50;
-				amount_parents = 10;
+
 				num_of_mutations = 10;
 				num_of_unchanged_best = 0;
 				max_of_unchanged_best = 200;
 				mutate_big = false;
 
-				multiple_parents = false;
+				multiple_parents = true;
+				amount_parents = 9;
 			}
     }
 
@@ -129,6 +130,7 @@ public class player36 implements ContestSubmission
 				new_children = create_n_children(population, parents);
 			}
 
+			System.out.println(mutate_big);
 			if (mutate_big) {
 
 				double chance = get_random_double(0, 1);
