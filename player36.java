@@ -243,15 +243,21 @@ public class player36 implements ContestSubmission
 	// The clusters means are updated
 	public double[][] rearange_clusters(double[][] children, double[][] survival_chances, double[][] clusters) {
 
+
+		for (int g= 0; g < clusters.length; g++){
+				System.out.println("tijdelijkse clusters");
+				System.out.println(Arrays.toString(clusters[g]));
+			}
+
 		double[] cluster_tot = new double[10];
 		double kids_in_cluster;
 
 		// for 5 clusters
 		for (int i = 0; i < clusters.length; i++) {
 
+			System.out.println(i);
 			for (int g= 0; g < clusters.length; g++){
-				System.out.println("tijdelijkse clusters");
-				System.out.println(Arrays.toString(clusters[i]));
+				System.out.println(Arrays.toString(clusters[g]));
 			}
 			
 			// Place zeros in cluster total for calculating mean
@@ -294,9 +300,17 @@ public class player36 implements ContestSubmission
 
 				clusters[i] = cluster_tot;
 				// System.out.println(Arrays.toString(clusters[i]));
+				System.out.println(i);
+				for (int g= 0; g < clusters.length; g++){
+				System.out.println(Arrays.toString(clusters[g]));
+			}
 			}
 		}
-
+		
+		for (int g= 0; g < clusters.length; g++){
+			System.out.println("uiteindeloijkse@@@@@@@@@ clusters");
+			System.out.println(Arrays.toString(clusters[g]));
+		}
 		// for (int i = 0; i < clusters.length; i++);{
 		// 	System.out.println(Arrays.toString(clusters[i]));	
 		// }
