@@ -18,12 +18,13 @@ public class player36 implements ContestSubmission
 	ContestEvaluation evaluation_;
   private int evaluations_limit_;
 	public int evals = 0;
-	int population_size ;
+	int population_size;
 	int tournament_size;
 	int amount_parents;
 	int num_of_mutations;
 	int num_of_unchanged_best;
 	int max_of_unchanged_best;
+	int num_of_clusters;
 	boolean mutate_big;
 	boolean multiple_parents;
 
@@ -65,6 +66,7 @@ public class player36 implements ContestSubmission
 				num_of_mutations = 10;
 				num_of_unchanged_best = 0;
 				max_of_unchanged_best = 200;
+				num_of_clusters = 5;
 				mutate_big = false;
 
 				// 3 parents (more efficient evolution?)
@@ -80,6 +82,7 @@ public class player36 implements ContestSubmission
 				num_of_mutations = 10;
 				num_of_unchanged_best = 0;
 				max_of_unchanged_best = 200;
+				num_of_clusters = 5;
 				mutate_big = false;
 
 				multiple_parents = true;
@@ -92,6 +95,7 @@ public class player36 implements ContestSubmission
 				num_of_mutations = 10;
 				num_of_unchanged_best = 0;
 				max_of_unchanged_best = 200;
+				num_of_clusters = 5;
 				mutate_big = false;
 
 				multiple_parents = true;
@@ -104,11 +108,19 @@ public class player36 implements ContestSubmission
 		// Create population of 100 ppl, each person has 10 gens
 		double population[][] = create_population(population_size);
 
+		// Initialize random individuals that function as the initial cluster means
+		double clusters[][] = create_population(num_of_clusters);
+
 		// Determine fitness for each child in population
 		double survival_chances[][] = score_checker(population);
 
 		// sort algorithm that sorts the children on fitness from min to max
 		double sorted_survival_chances[][] = sort_survival_chances(survival_chances);
+
+		// Arange children to clusters
+		survival_chances = arange_children_to_clusters(population, survival_chances, clusters);
+		clusters = rearange_clusters(population, survival_chances, clusters);
+		survival_chances = arange_children_to_clusters(population, survival_chances, clusters);
 
 		// Calculate fitness
 		// while (evals < 2000) {
@@ -161,9 +173,88 @@ public class player36 implements ContestSubmission
 				mutate_big = false;
 			}
 
-
-			print_average_score(sorted_survival_chances);
+			// print_average_score(sorted_survival_chances);
 		}
+		survival_chances = arange_children_to_clusters(population, survival_chances, clusters);
+		clusters = rearange_clusters(population, survival_chances, clusters);
+
+		for (int i = 0; i < clusters.length; i++) {
+			System.out.print(i);
+			System.out.println(Arrays.toString(clusters[i]));
+		}
+	}
+
+	// Part 1 of the k-means clustering
+	// The children are assigned to a cluster
+	public double[][] arange_children_to_clusters(double[][] children, double[][] survival_chances, double[][] clusters) {
+		for (int i = 0; i < children.length; i++) {
+			int child_index = (int) survival_chances[i][1];
+			double[] child = children[child_index];
+			double childs_min = 1000;
+			int cluster_num = -1;
+			for (int j = 0; j < clusters.length; j++) {
+				double[] cluster = clusters[j];
+				double dist = 0.0;
+				for (int k = 0; k < child.length; k++){
+					dist = dist + (child[k] - cluster[k]) * (child[k] - cluster[k]);
+				}
+				dist = Math.sqrt(dist);
+				if (dist < childs_min){
+					childs_min = dist;
+					cluster_num = j;
+				}
+			}
+			survival_chances[i][2] = cluster_num;
+		}
+		return survival_chances;
+	}
+
+	// Part 2 of the k-means clustering
+	// The clusters means are updated
+	public double[][] rearange_clusters(double[][] children, double[][] survival_chances, double[][] clusters) {
+		double[][] new_clusters = new double[clusters.length][10];
+		double[] cluster_tot = new double[10];
+		double cluster_div;
+		for (int i = 0; i < clusters.length; i++) {
+			// Place zeros in cluster total for calculating mean
+			for (int c = 0; c < cluster_tot.length; c++){
+				cluster_tot[c] = 0;
+			}
+			cluster_div = 0.0;
+			// Loop over all children and their corresponding indexes
+			// Get their corresponding cluster
+			for (int j = 0; j < survival_chances.length; j++){
+				double[] fic = survival_chances[j];
+				// System.out.println(Arrays.toString(fic));
+				int clust_num = (int) fic[2];
+				if(clust_num == i) {
+					int index = (int) fic[1];
+					for (int c = 0; c < cluster_tot.length; c++){
+						cluster_tot[c] = cluster_tot[c] + children[index][c];
+					}
+					// cluster_tot = cluster_tot + children[index];
+					cluster_div = cluster_div + 1.0;
+				}
+			}
+
+			if ( cluster_div > 0.0) {
+				System.out.println(cluster_div);
+				for (int c = 0; c < cluster_tot.length; c++) {
+					cluster_tot[c] = cluster_tot[c] / cluster_div;
+				}
+				clusters[i] = cluster_tot;
+			}
+			System.out.print(i);
+			System.out.println(Arrays.toString(cluster_tot));
+			new_clusters[i] = cluster_tot;
+			// System.out.println(Arrays.toString(cluster_tot));
+			// System.out.println(Arrays.toString(clusters[i]));
+		}
+		System.out.println("BOB TEST");
+		for (int d = 0; d < new_clusters.length; d++) {
+			System.out.println(Arrays.toString(new_clusters[d]));
+		}
+		return clusters;
 	}
 
 	public double[][] create_children_from_multiple_parents(double[][] population, double[][] parents) {
@@ -354,7 +445,7 @@ public class player36 implements ContestSubmission
 
 		for (int i = 0; i < population.length; i++) {
 
-			double fit_index_array[] = new double [2];
+			double fit_index_array[] = new double [3];
 
 			// calculate and save the fitness of this individual
 			double fitness = (double) evaluation_.evaluate(population[i]);
@@ -362,8 +453,11 @@ public class player36 implements ContestSubmission
 			// on the ith array at the left side, place the fitness
 			fit_index_array[0] = fitness;
 
-			// on the ith array at the right side, place the index number
+			// on the ith array at the middle side, place the index number
 			fit_index_array[1] = i;
+
+			// on the ith array at the right side, place the cluster number, which is initially a dummy
+			fit_index_array[2] = -1.0;
 
 			// place the array in the big array
 			fitness_index_array[i] = fit_index_array;
