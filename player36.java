@@ -111,10 +111,6 @@ public class player36 implements ContestSubmission
 		// Initialize random individuals that function as the initial cluster means
 		double clusters[][] = create_population(num_of_clusters);
 
-		for (int i = 0; i < clusters.length; i++){
-			System.out.println(Arrays.toString(clusters[i]));
-		}
-
 		// Determine fitness for each child in population
 		double survival_chances[][] = score_checker(population);
 
@@ -123,11 +119,7 @@ public class player36 implements ContestSubmission
 
 		// Arange children to clusters
 		survival_chances = arange_children_to_clusters(population, survival_chances, clusters);
-		clusters = rearange_clusters(population, survival_chances, clusters);
-		// for (int i = 0 ; i < clusters.length; i++){
-		// 	System.out.println(Arrays.toString(clusters[i]));
-		// }
-		// survival_chances = arange_children_to_clusters(population, survival_chances, clusters);
+		clusters = rearrange_clusters(population, survival_chances, clusters);
 
 		// Calculate fitness
 		while (evals < 20) {
@@ -185,13 +177,13 @@ public class player36 implements ContestSubmission
 		// survival_chances = arange_children_to_clusters(population, survival_chances, clusters);
 		// for (int i = 0; i < survival_chances.length; i++) {
 		// 	System.out.println(Arrays.toString(sorted_survival_chances[i]));
-		// clusters = rearange_clusters(population, survival_chances, clusters);
+		// clusters = rearrange_clusters(population, survival_chances, clusters);
 
 		// for (int i = 0; i < clusters.length; i++) {
 		// 	System.out.print(i);
 		// 	System.out.println(Arrays.toString(clusters[i]));
 
-		
+
 	}
 
 
@@ -215,7 +207,7 @@ public class player36 implements ContestSubmission
 
 			// determine in wich cluster the child fitst the best
 			for (int j = 0; j < clusters.length; j++) {
-	
+
 				double[] cluster = clusters[j];
 
 				double dist = 0.0;
@@ -241,13 +233,7 @@ public class player36 implements ContestSubmission
 
 	// Part 2 of the k-means clustering
 	// The clusters means are updated
-	public double[][] rearange_clusters(double[][] children, double[][] survival_chances, double[][] clusters) {
-
-
-		for (int g= 0; g < clusters.length; g++){
-				System.out.println("tijdelijkse clusters");
-				System.out.println(Arrays.toString(clusters[g]));
-			}
+	public double[][] rearrange_clusters(double[][] children, double[][] survival_chances, double[][] clusters) {
 
 		double[] cluster_tot = new double[10];
 		double kids_in_cluster;
@@ -255,35 +241,30 @@ public class player36 implements ContestSubmission
 		// for 5 clusters
 		for (int i = 0; i < clusters.length; i++) {
 
-			System.out.println(i);
-			for (int g= 0; g < clusters.length; g++){
-				System.out.println(Arrays.toString(clusters[g]));
-			}
-			
 			// Place zeros in cluster total for calculating mean
-			for (int c = 0; c < cluster_tot.length; c++){
-				cluster_tot[c] = 0;
+			for (int j = 0; j < cluster_tot.length; j++){
+				cluster_tot[j] = 0;
 			}
 
 			kids_in_cluster = 0;
 
 			// loop throw all kids and place them in the right cluster
-			for (int j = 0; j < survival_chances.length; j++){
+			for (int k = 0; k < survival_chances.length; k++){
 
 				// take the row from surv. changes
-				double[] row = survival_chances[j];
+				double[] row = survival_chances[k];
 
 				// take the cluster number
 				int clust_num = (int) row[2];
-				// System.out.println(clust_num);
+
 				// if the child you are looking at is cluster i
 				if (clust_num == i) {
 
 					int index = (int) row[1];
 
 					// add to the cluster with the genes from the child you are looking at
-					for (int c = 0; c < cluster_tot.length; c++){
-						cluster_tot[c] = cluster_tot[c] + children[index][c];
+					for (int l = 0; l < cluster_tot.length; l++){
+						cluster_tot[l] = cluster_tot[l] + children[index][l];
 					}
 					// cluster_tot = cluster_tot + children[index];
 					kids_in_cluster = kids_in_cluster + 1;
@@ -296,24 +277,10 @@ public class player36 implements ContestSubmission
 				// calculate the new cluster mean
 				for (int c = 0; c < cluster_tot.length; c++) {
 					cluster_tot[c] = cluster_tot[c] /		kids_in_cluster;
+					clusters[i][c] = cluster_tot[c];
 				}
-
-				clusters[i] = cluster_tot;
-				// System.out.println(Arrays.toString(clusters[i]));
-				System.out.println(i);
-				for (int g= 0; g < clusters.length; g++){
-				System.out.println(Arrays.toString(clusters[g]));
-			}
 			}
 		}
-		
-		for (int g= 0; g < clusters.length; g++){
-			System.out.println("uiteindeloijkse@@@@@@@@@ clusters");
-			System.out.println(Arrays.toString(clusters[g]));
-		}
-		// for (int i = 0; i < clusters.length; i++);{
-		// 	System.out.println(Arrays.toString(clusters[i]));	
-		// }
 
 		return clusters;
 	}

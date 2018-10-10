@@ -57,5 +57,3 @@ plt.plot(avg_array, color="C1", label="avg")
 plt.plot(best_array, color="C0", label="best")
 plt.legend()
 plt.show()
-
-
