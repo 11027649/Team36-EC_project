@@ -1,0 +1,5 @@
+compilen:
+javac -cp contest.jar player36.java 
+
+runnen op BentCigarFunction:
+java -jar testrun.jar -submission=player36 -evaluation=BentCigarFunction -seed=1 
