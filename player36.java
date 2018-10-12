@@ -28,6 +28,7 @@ public class player36 implements ContestSubmission
 	boolean mutate_big;
 	boolean multiple_parents;
 	int[] cluster_count_array;
+	int num_parents_from_cluster;
 
 	public player36()
 	{
@@ -67,7 +68,8 @@ public class player36 implements ContestSubmission
 				num_of_mutations = 10;
 				num_of_unchanged_best = 0;
 				max_of_unchanged_best = 200;
-				num_of_clusters = 5;
+				num_of_clusters = 20;
+				num_parents_from_cluster = 1;
 				mutate_big = false;
 
 				// 3 parents (more efficient evolution?)
@@ -83,20 +85,22 @@ public class player36 implements ContestSubmission
 				num_of_mutations = 10;
 				num_of_unchanged_best = 0;
 				max_of_unchanged_best = 200;
-				num_of_clusters = 5;
+				num_of_clusters = 20;
+				num_parents_from_cluster = 2;
 				mutate_big = false;
 
 				multiple_parents = true;
 				amount_parents = 9;
 			}
 			else if (katsuura) {
-				population_size = 250;
+				population_size = 1000;
 				tournament_size = 50;
 
 				num_of_mutations = 10;
 				num_of_unchanged_best = 0;
 				max_of_unchanged_best = 200;
-				num_of_clusters = 5;
+				num_of_clusters = 100;
+				num_parents_from_cluster = 5;
 				mutate_big = false;
 
 				multiple_parents = true;
@@ -122,18 +126,27 @@ public class player36 implements ContestSubmission
 		// sort algorithm that sorts the children on fitness from min to max
 		double sorted_survival_chances[][] = sort_survival_chances(survival_chances);
 
-		// Arange children to clusters
+		// Arange population to clusters
 		int max_cluster_iterations = 10;
 		int iterations_counter = 0;
 		int correction_counter;
 		do {
 			iterations_counter++;
+			// Create copy of clusters
 			double[][] clusters_clone = new double[num_of_clusters][10];
 			for (int i = 0; i < num_of_clusters; i++){
 				clusters_clone[i] = Arrays.copyOf(clusters[i],clusters[i].length);
 			}
+			// Arange all individuals of population to a certain cluster
 			survival_chances = arange_children_to_clusters(population, survival_chances, clusters);
+			// Rearange clusters by recalculating the mean
 			clusters = rearrange_clusters(population, survival_chances, clusters);
+
+
+			System.out.println(Arrays.toString(clusters[0]));
+			System.out.println(Arrays.toString(clusters_clone[0]));
+			System.out.println("\n");
+
 			correction_counter = 0;
 			for (int i = 0; i < num_of_clusters; i++){
 				if (Arrays.equals(clusters_clone[i],clusters[i])){
@@ -152,6 +165,9 @@ public class player36 implements ContestSubmission
 
 			// function input is the list of n random parents. It selects 2 parents from the n input parents.
 			double[][] parents = tournament_parent_selection(amount_parents, tournament_size, sorted_survival_chances);
+			// for (int bob = 0; bob < parents.length; bob++){
+			// 	System.out.println(Arrays.toString(parents[bob]));
+			// }
 			// Guarantee that the best individual reproduces
 			parents[parents.length-1] = sorted_survival_chances[sorted_survival_chances.length-1];
 
@@ -163,17 +179,49 @@ public class player36 implements ContestSubmission
 					}
 				}
 				int best_individual_least_cluster_index = 0;
+				int new_c = 0;
 				for (int s = 0; s < sorted_survival_chances.length; s++) {
 					if ( (int) sorted_survival_chances[s][2] == least_used_cluster_index ){
-						System.out.println("BKSHJALSFDJ");
 						best_individual_least_cluster_index = s;
-						break;
+						parents[new_c] = sorted_survival_chances[best_individual_least_cluster_index];
+						new_c++;
+						if (new_c > num_parents_from_cluster){
+							new_c = 0;
+						}
+						// break;
 					}
 				}
-				// System.out.println(best_individual_least_cluster_index);
-				// System.out.println(Arrays.toString(sorted_survival_chances[best_individual_least_cluster_index]));
-				parents[0] = sorted_survival_chances[best_individual_least_cluster_index];
 			}
+
+			if (mutate_big) {
+				Random random = new Random();
+				int r = random.nextInt(num_of_clusters);
+				// System.out.println(r);
+				int parents_counter = 0;
+
+				// loop throw all kids
+				for (int i = 0; i < sorted_survival_chances.length; i++){
+
+					// if the child belongs to the clusers we are looking at
+					if ((int) sorted_survival_chances[i][2] == r){
+
+						// place the child in the parents pool
+						parents[parents_counter] = sorted_survival_chances[i];
+						parents_counter++;
+
+						// do this untill the paretns pool is full
+						if (parents_counter == parents.length){
+							break;
+						}
+					}
+				}
+			}
+
+			// System.out.println("DKDKKDKDKDKKDKKDKDKKDKKKDKDKKDKDKDKDKDDKDKDKDKDKDKKDKDKDK");
+			// for (int i = 0; i < parents_pool.length; i++){
+			// 	System.out.println(Arrays.toString(parents_pool[i]));
+			// }
+
 
 			for (int i = 0; i < parents.length; i++){
 				cluster_count_array[(int) parents[i][2]]++;
@@ -223,6 +271,7 @@ public class player36 implements ContestSubmission
 			print_average_score(sorted_survival_chances);
 		}
 
+		System.out.println("SWAG");
 		int least_used_cluster_index = 0;
 		System.out.println(cluster_count_array[0]);
 		for(int i = 1; i < num_of_clusters; i++) {
@@ -240,6 +289,13 @@ public class player36 implements ContestSubmission
 		// for (int i = 0; i < clusters.length; i++) {
 		// 	System.out.print(i);
 		// 	System.out.println(Arrays.toString(clusters[i]));
+		for (int c2 = 0; c2 < clusters.length; c2++){
+			for (int c = 0; c < population.length; c++){
+				if ((int) sorted_survival_chances[c][2] == c2){
+					System.out.println(Arrays.toString(sorted_survival_chances[c]));
+				}
+			}
+		}
 
 
 	}
@@ -347,6 +403,13 @@ public class player36 implements ContestSubmission
 	}
 
 	public double[][] create_children_from_multiple_parents(double[][] population, double[][] parents) {
+
+
+		System.out.println("Koeeeee");
+		for (int koe = 0; koe < parents.length; koe ++){
+			System.out.println(Arrays.toString(parents[koe]));
+		}
+
 		double[][] children = new double[parents.length][10];
 
 		for (int i = 0; i < parents.length; i += 3) {
@@ -470,7 +533,7 @@ public class player36 implements ContestSubmission
 	public double[][] select_n_random_elements(int n, double[][] sort_list) {
 
 		// Select n random integers between zero and a maximum value.
-		int random_number_list[] = printRandomNumbers(n,99);
+		int random_number_list[] = printRandomNumbers(n,population_size-1);
 
 		double random_n_elements[][] = new double[n][];
 
