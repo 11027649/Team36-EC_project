@@ -27,6 +27,7 @@ public class player36 implements ContestSubmission
 	int num_of_clusters;
 	boolean mutate_big;
 	boolean multiple_parents;
+	int[] cluster_count_array;
 
 	public player36()
 	{
@@ -110,6 +111,10 @@ public class player36 implements ContestSubmission
 
 		// Initialize random individuals that function as the initial cluster means
 		double clusters[][] = create_population(num_of_clusters);
+		cluster_count_array = new int[num_of_clusters];
+		for (int i = 0; i < num_of_clusters; i++){
+			cluster_count_array[i] = 0;
+		}
 
 		// Determine fitness for each child in population
 		double survival_chances[][] = score_checker(population);
@@ -118,20 +123,61 @@ public class player36 implements ContestSubmission
 		double sorted_survival_chances[][] = sort_survival_chances(survival_chances);
 
 		// Arange children to clusters
-		survival_chances = arange_children_to_clusters(population, survival_chances, clusters);
-		clusters = rearrange_clusters(population, survival_chances, clusters);
+		int max_cluster_iterations = 10;
+		int iterations_counter = 0;
+		int correction_counter;
+		do {
+			iterations_counter++;
+			double[][] clusters_clone = new double[num_of_clusters][10];
+			for (int i = 0; i < num_of_clusters; i++){
+				clusters_clone[i] = Arrays.copyOf(clusters[i],clusters[i].length);
+			}
+			survival_chances = arange_children_to_clusters(population, survival_chances, clusters);
+			clusters = rearrange_clusters(population, survival_chances, clusters);
+			correction_counter = 0;
+			for (int i = 0; i < num_of_clusters; i++){
+				if (Arrays.equals(clusters_clone[i],clusters[i])){
+					correction_counter++;
+				}
+			}
+		} while (iterations_counter < max_cluster_iterations || correction_counter != num_of_clusters);
 
 		// Calculate fitness
-		while (evals < 20) {
+		// while (evals < 20) {
 		// System.out.println(evaluations_limit_);
 
-		// while (evals < evaluations_limit_) {
+		while (evals < evaluations_limit_) {
 
 			double old_best_person = sorted_survival_chances[sorted_survival_chances.length -1][0];
 
 			// function input is the list of n random parents. It selects 2 parents from the n input parents.
 			double[][] parents = tournament_parent_selection(amount_parents, tournament_size, sorted_survival_chances);
+			// Guarantee that the best individual reproduces
 			parents[parents.length-1] = sorted_survival_chances[sorted_survival_chances.length-1];
+
+			if (mutate_big) {
+				int least_used_cluster_index = 0;
+				for (int i = 1; i < num_of_clusters; i++) {
+					if (cluster_count_array[i] < cluster_count_array[least_used_cluster_index]) {
+						least_used_cluster_index = i;
+					}
+				}
+				int best_individual_least_cluster_index = 0;
+				for (int s = 0; s < sorted_survival_chances.length; s++) {
+					if ( (int) sorted_survival_chances[s][2] == least_used_cluster_index ){
+						System.out.println("BKSHJALSFDJ");
+						best_individual_least_cluster_index = s;
+						break;
+					}
+				}
+				// System.out.println(best_individual_least_cluster_index);
+				// System.out.println(Arrays.toString(sorted_survival_chances[best_individual_least_cluster_index]));
+				parents[0] = sorted_survival_chances[best_individual_least_cluster_index];
+			}
+
+			for (int i = 0; i < parents.length; i++){
+				cluster_count_array[(int) parents[i][2]]++;
+			}
 
 			double[][] new_children;
 
@@ -141,7 +187,7 @@ public class player36 implements ContestSubmission
 				new_children = create_n_children(population, parents);
 			}
 
-			System.out.println(mutate_big);
+			// System.out.println(mutate_big);
 			if (mutate_big) {
 
 				double chance = get_random_double(0, 1);
@@ -171,9 +217,21 @@ public class player36 implements ContestSubmission
 				num_of_unchanged_best = 0;
 				mutate_big = false;
 			}
+			System.out.println(num_of_unchanged_best);
 
-			// print_average_score(sorted_survival_chances);
+			// Run for python plot code
+			print_average_score(sorted_survival_chances);
 		}
+
+		int least_used_cluster_index = 0;
+		System.out.println(cluster_count_array[0]);
+		for(int i = 1; i < num_of_clusters; i++) {
+			System.out.println(cluster_count_array[i]);
+			if (cluster_count_array[i] < cluster_count_array[least_used_cluster_index]) {
+				least_used_cluster_index = i;
+			}
+		}
+		System.out.println(least_used_cluster_index);
 		// survival_chances = arange_children_to_clusters(population, survival_chances, clusters);
 		// for (int i = 0; i < survival_chances.length; i++) {
 		// 	System.out.println(Arrays.toString(sorted_survival_chances[i]));
@@ -282,6 +340,9 @@ public class player36 implements ContestSubmission
 			}
 		}
 
+		// for (int a = 0; a < clusters.length; a++){
+		// 	System.out.println(Arrays.toString(clusters[a]));
+		// }
 		return clusters;
 	}
 
