@@ -28,6 +28,8 @@ for i in range(0,n):
 		print("Dumbass, you couldn't complete the task of typing 0, 1 or 2")
 		exit(1);
 
+	# score = float((java_output.split('\n')[-3]))
+
 	score = float(java_output.split('\n')[-3].split(' ')[1])
 	scoreList.append(score)
 	total = total + score

@@ -64,7 +64,7 @@ public class player36 implements ContestSubmission
 
 			// Do sth with property values, e.g. specify relevant settings of your algorithm
 	    if (bentCigar) {
-				population_size = 100;
+				population_size = 50;
 				tournament_size = 25;
 				num_of_mutations = 10;
 				num_of_unchanged_best = 0;
@@ -410,7 +410,7 @@ public class player36 implements ContestSubmission
 	public double[][] create_children_from_multiple_parents(double[][] population, double[][] parents) {
 
 
-		System.out.println("Koeeeee");
+		// System.out.println("Koeeeee");
 		for (int koe = 0; koe < parents.length; koe ++){
 			System.out.println(Arrays.toString(parents[koe]));
 		}
@@ -502,6 +502,11 @@ public class player36 implements ContestSubmission
 		for (int i = 0; i < new_children.length; i++) {
 			// Get index of those to replace
 			Double fitness = (double) evaluation_.evaluate(new_children[i]);
+
+
+			System.out.println("Gezeik");
+			System.out.println(fitness);
+
 			evals++;
 			survival_chances[i][0] = fitness;
 
