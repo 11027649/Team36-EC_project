@@ -128,6 +128,9 @@ public class player36 implements ContestSubmission
 		// Sort algorithm that sorts the children on fitness from min to max.
 		population.sort(population_size);
 
+		// Cluster cluster = new Cluster(num_of_clusters);
+
+
 		// // Initialize random individuals that function as the initial cluster means
 		// double clusters[][] = create_population(num_of_clusters);
 		// cluster_count_array = new int[num_of_clusters];
@@ -468,8 +471,8 @@ public class player36 implements ContestSubmission
 
 		for (int i = 0; i < amount_parents; i += 2) {
 			Population temp_children = create_two_children(parents.getIndividual(i), parents.getIndividual(i + 1));
-			kids.setIndividual(i, temp_children.getIndividual(i));
-			kids.setIndividual(i + 1, temp_children.getIndividual(i + 1));
+			kids.setIndividual(i, temp_children.getIndividual(0));
+			kids.setIndividual(i + 1, temp_children.getIndividual(1));
 		}
 
 		return kids;
@@ -554,13 +557,13 @@ public class player36 implements ContestSubmission
 		Population kids = new Population(2);
 
 	    // make 5 int in an array from 0 - 9
-	    int[] indices = printRandomNumbers(5, 9);
+	    int[] indices = printRandomNumbers(10, 9);
 	    // System.out.println(Arrays.toString(parent_indices));
 
 	    for (int i = 0; i < 10; i++) {
 				if (i < 5) {
 						kids.getIndividual(0).genome[indices[i]] = parent1.genome[indices[i]];
-						kids.getIndividual(1).genome[indices[i]] = parent2.genome[i];
+						kids.getIndividual(1).genome[indices[i]] = parent2.genome[indices[i]];
 	       } else {
 						kids.getIndividual(0).genome[indices[i]] = parent2.genome[indices[i]];
  						kids.getIndividual(1).genome[indices[i]] = parent1.genome[indices[i]];

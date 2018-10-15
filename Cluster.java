@@ -1,11 +1,17 @@
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
+
 public class Cluster {
 
-   List<Individual> clusters = new List<Individual>();
+   // List<Individual> clusters = new List<Individual>();
+   ArrayList<Individual> clusters = new ArrayList<Individual>();
    int amount_of_clusters = 0;
+   int[] cluster_count_array;
 
    Cluster(int amount_of_clusters) {
-      this.nitialize_clusters(amount_of_clusters);
       this.amount_of_clusters = amount_of_clusters;
+      this.initialize_clusters(amount_of_clusters);
    }
 
    public void initialize_clusters(int amount_of_clusters) {
@@ -13,7 +19,7 @@ public class Cluster {
      int dimension = 10;
 
      // initialize population randomly
-     for (int i = 0; i < pop_size; i++) {
+     for (int i = 0; i < amount_of_clusters; i++) {
        Individual child = new Individual();
 
        for (int j = 0; j < dimension; j++) {
@@ -22,16 +28,16 @@ public class Cluster {
        }
 
        // add child to population
-       clusers.add(child);
+       clusters.add(child);
      }
-     cluster_count_array = new int[num_of_clusters];
-     for (int i = 0; i < num_of_clusters; i++){
+     cluster_count_array = new int[amount_of_clusters];
+     for (int i = 0; i < amount_of_clusters; i++){
        cluster_count_array[i] = 0;
- 		}
+ 		 }
    }
 
    public void name() {
-     // Arange population to clusters
+     // Arrange population to clusters
  					int max_cluster_iterations = 10;
  					int iterations_counter = 0;
  					int correction_counter;
@@ -40,13 +46,17 @@ public class Cluster {
 
  						// Create copy of clusters
             // NOTE: Not entirally sure if this works.
- 						List<Individual> clusters_clone = new List<Individual>(num_of_clusters);
- 						for (Cluster c : clusters ){
- 							clusters_clone.add(c.clone());
- 						}
- 						// Arange all individuals of population to a certain cluster
- 						survival_chances = arange_children_to_clusters(population, clusters);
- 						// Rearange clusters by recalculating the mean
+            // List<Individual> clusters_clone = new List<Individual>(amount_of_clusters);
+            ArrayList<Individual> clusters_clone = new ArrayList<Individual>(amount_of_clusters);
+ 						// for (Cluster c : clusters ){
+ 						// 	clusters_clone.add(c.clone());
+ 						// }
+            for (int i = 0; i < amount_of_clusters; i++){
+
+            }
+ 						// Arrange all individuals of population to a certain cluster
+ 						survival_chances = arrange_children_to_clusters(population, clusters);
+ 						// Rearrange clusters by recalculating the mean
  						clusters = rearrange_clusters(population, survival_chances, clusters);
 
 
@@ -55,18 +65,18 @@ public class Cluster {
  						System.out.println("\n");
 
  						correction_counter = 0;
- 						for (int i = 0; i < num_of_clusters; i++){
+ 						for (int i = 0; i < amount_of_clusters; i++){
  							if (clusters_clone.get(i) == clusters.get(i)) {
  								correction_counter++;
  							}
  						}
- 					} while (iterations_counter < max_cluster_iterations || correction_counter != num_of_clusters);
+ 					} while (iterations_counter < max_cluster_iterations || correction_counter != amount_of_clusters);
    }
 
-   // arrange clusters
-   // Part 1 of the k-means clustering
+  // arrange clusters
+  // Part 1 of the k-means clustering
  	// The children are assigned to a cluster
- 	public Population arange_children_to_clusters(Population children, double[][] survival_chances, Population clusters) {
+ 	public Population arrange_children_to_clusters(Population children, double[][] survival_chances, Population clusters) {
 
  		// loop through all kids
  		for (int i = 0; i < amount_of_clusters; i++) {
@@ -84,7 +94,7 @@ public class Cluster {
 
  				double dist = 0.0;
 
- 				// compare 1 gene of the kid with 10 genes from the cluster... @ Tobais, I think this is wrong
+ 				// compare 1 gene of the kid with 10 genes from the cluster
  				for (int k = 0; k < child.genome.length; k++){
 
  					// take the square distance
@@ -159,5 +169,9 @@ public class Cluster {
  		// }
  		return clusters;
  	}
+
+  public double get_random_double(int min, int max) {
+   return (Math.random() * (max - min)) + min;
+  }
 
  }
