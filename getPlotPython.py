@@ -2,7 +2,7 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 
-os.system('javac -cp contest.jar player36.java')
+os.system('javac -cp contest.jar player36.java Individual.java Population.java')
 
 print(" (0) BentCigarFunction \n (1) Schaffers F17 \n (2) Katsuura \n Type your choice: ", end="")
 what_function = int(input())
