@@ -1,7 +1,7 @@
 import os
 import matplotlib.pyplot as plt
 
-os.system('javac -cp contest.jar player36.java')
+os.system('javac -cp contest.jar player36.java Individual.java Population.java')
 
 print(" (0) BentCigarFunction \n (1) Schaffers F17 \n (2) Katsuura \n Type your choice: ", end="")
 what_function = int(input())
@@ -28,14 +28,19 @@ for i in range(0,n):
 		print("Dumbass, you couldn't complete the task of typing 0, 1 or 2")
 		exit(1);
 
-	score = float(java_output.split('\n')[-3].split(' ')[1])
-	scoreList.append(score)
-	total = total + score
-	print(score)
-	if score > maxi:
-		maxi = score
-	if score < mini:
-		mini = score
+	# print(java_output.split('\n')[-3])
+	try:
+		score = float(java_output.split('\n')[-3].split(' ')[1])
+		scoreList.append(score)
+		total = total + score
+		print(score)
+		if score > maxi:
+			maxi = score
+		if score < mini:
+			mini = score
+	except:
+		print("Error")
+
 
 avg = total/n
 print('Average:\t',avg)
