@@ -7,10 +7,12 @@ import java.util.Properties;
 public class Population {
   // NIEUW
   ArrayList<Individual> population = new ArrayList<Individual>();
+  int pop_size = 0;
 
   Population(int pop_size) {
    // population = new ArrayList<Individual>(pop_size);
    this.initialize_population(pop_size);
+   this.pop_size = pop_size;
   }
 
   // Initialize the population with random individuals.
@@ -45,7 +47,7 @@ public class Population {
     }
   }
 
-  public Population tournament_selection(int parents_amount, int population_size, int tournament_size) {
+  public Population tournament_selection(int parents_amount, int population_size, int tournament_size, Cluster clusters) {
     Population parents = new Population(parents_amount);
 
     for (int i = 0; i < parents_amount; i++) {

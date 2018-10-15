@@ -12,7 +12,7 @@ import java.lang.Math;
 public class Individual {
    double[] genome = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
    double fitness = 0;
-   double cluster = 0;
+   int cluster = 0;
 
    Individual() {
    }
@@ -21,7 +21,7 @@ public class Individual {
      this.cluster = cluster;
    }
 
-   public double getCluster() {
+   public int getCluster() {
      return this.cluster;
    }
 

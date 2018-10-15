@@ -4,8 +4,8 @@ import java.util.List;
 
 public class Cluster {
 
-   // List<Individual> clusters = new List<Individual>();
-   ArrayList<Individual> clusters = new ArrayList<Individual>();
+   List<Individual> clusters = new ArrayList<Individual>();
+   // ArrayList<Individual> clusters = new ArrayList<Individual>();
    int amount_of_clusters = 0;
    int[] cluster_count_array;
 
@@ -36,7 +36,7 @@ public class Cluster {
  		 }
    }
 
-   public void name() {
+   public void cluster_convergence(Population population) {
      // Arrange population to clusters
  					int max_cluster_iterations = 10;
  					int iterations_counter = 0;
@@ -46,23 +46,31 @@ public class Cluster {
 
  						// Create copy of clusters
             // NOTE: Not entirally sure if this works.
-            // List<Individual> clusters_clone = new List<Individual>(amount_of_clusters);
-            ArrayList<Individual> clusters_clone = new ArrayList<Individual>(amount_of_clusters);
- 						// for (Cluster c : clusters ){
+            List<Individual> clusters_clone = new ArrayList<Individual>(amount_of_clusters);
+            // ArrayList<Individual> clusters_clone = new ArrayList<Individual>(amount_of_clusters);
+ 						
+       //      for (Individual c : clusters ){
+       //        // Individual cloned = c.clone();
  						// 	clusters_clone.add(c.clone());
  						// }
             for (int i = 0; i < amount_of_clusters; i++){
-
+            
+             // clusters_clone.set(i, clusters.get(i));
+             Individual temporary_cluster = clusters.get(i);
+             Individual cloned_cluster = new Individual();
+             for(int j = 0; j < 10; j++) {
+              cloned_cluster.genome[j] = temporary_cluster.genome[j];
+             }
+             clusters_clone.set(i,cloned_cluster);
+             // Arrays.copyOf(clusters[i],clusters[i].length);
+            
             }
+
  						// Arrange all individuals of population to a certain cluster
- 						survival_chances = arrange_children_to_clusters(population, clusters);
+ 						population = arrange_children_to_clusters(population);
  						// Rearrange clusters by recalculating the mean
- 						clusters = rearrange_clusters(population, survival_chances, clusters);
+ 						rearrange_clusters(population);
 
-
- 						System.out.println(Arrays.toString(clusters.get(0).toArray()));
- 						System.out.println(Arrays.toString(clusters_clone.get(0).toArray()));
- 						System.out.println("\n");
 
  						correction_counter = 0;
  						for (int i = 0; i < amount_of_clusters; i++){
@@ -76,7 +84,7 @@ public class Cluster {
   // arrange clusters
   // Part 1 of the k-means clustering
  	// The children are assigned to a cluster
- 	public Population arrange_children_to_clusters(Population children, double[][] survival_chances, Population clusters) {
+ 	public Population arrange_children_to_clusters(Population children) {
 
  		// loop through all kids
  		for (int i = 0; i < amount_of_clusters; i++) {
@@ -90,7 +98,7 @@ public class Cluster {
  			// Determine in which cluster the child fits the best.
  			for (int j = 0; j < amount_of_clusters; j++) {
 
- 				Individual cluster = clusters.getIndividual(j);
+ 				Individual cluster = clusters.get(j);
 
  				double dist = 0.0;
 
@@ -98,7 +106,7 @@ public class Cluster {
  				for (int k = 0; k < child.genome.length; k++){
 
  					// take the square distance
- 					dist = dist + (child.genome.get(k) - cluster.genome.get(k)) * (child.genome.get(k) - cluster.genome.get(k));
+ 					dist = dist + (child.genome[k] - cluster.genome[k]) * (child.genome[k] - cluster.genome[k]);
  				}
 
  				dist = Math.sqrt(dist);
@@ -115,7 +123,7 @@ public class Cluster {
 
  	// Part 2 of the k-means clustering
  	// The clusters means are updated
- 	public Population rearrange_clusters(Population children, Population clusters) {
+ 	public void rearrange_clusters(Population children) {
 
  		Individual cluster_tot = new Individual();
  		double kids_in_cluster;
@@ -124,29 +132,26 @@ public class Cluster {
  		for (int i = 0; i < amount_of_clusters; i++) {
 
  			// Place zeros in cluster total for calculating mean
- 			for (int j = 0; j < cluster_tot.length; j++){
- 				cluster_tot[j] = 0;
+ 			for (int j = 0; j < cluster_tot.genome.length; j++){
+ 				cluster_tot.genome[j] = 0.0;
  			}
 
  			kids_in_cluster = 0;
 
  			// loop throw all kids and place them in the right cluster
- 			for (int k = 0; k < amount_of_clusters; k++){
-
- 				// take the row from surv. changes
- 				double[] row = survival_chances[k];
+ 			for (int k = 0; k < children.pop_size; k++){
 
  				// take the cluster number
- 				int clust_num = children.get(k).cluster;
+ 				int clust_num = children.getIndividual(k).getCluster();
 
  				// if the child you are looking at is cluster i
  				if (clust_num == i) {
 
- 					int index = (int) row[1];
+ 					// int index = (int) row[1];
 
  					// add to the cluster with the genes from the child you are looking at
- 					for (int l = 0; l < cluster_tot.length; l++){
- 						cluster_tot[l] = cluster_tot[l] + children[index][l];
+ 					for (int l = 0; l < cluster_tot.genome.length; l++){
+ 						cluster_tot.genome[l] = cluster_tot.genome[l] + children.getIndividual(k).genome[l];
  					}
  					// cluster_tot = cluster_tot + children[index];
  					kids_in_cluster = kids_in_cluster + 1;
@@ -157,9 +162,8 @@ public class Cluster {
  				// System.out.println		kids_in_cluster);
 
  				// calculate the new cluster mean
- 				for (int c = 0; c < cluster_tot.length; c++) {
- 					cluster_tot[c] = cluster_tot[c] /		kids_in_cluster;
- 					clusters[i][c] = cluster_tot[c];
+ 				for (int c = 0; c < cluster_tot.genome.length; c++) {
+ 					clusters.get(i).genome[c] = cluster_tot.genome[c] /	kids_in_cluster;
  				}
  			}
  		}
@@ -167,7 +171,7 @@ public class Cluster {
  		// for (int a = 0; a < clusters.length; a++){
  		// 	System.out.println(Arrays.toString(clusters[a]));
  		// }
- 		return clusters;
+ 		// return clusters;
  	}
 
   public double get_random_double(int min, int max) {

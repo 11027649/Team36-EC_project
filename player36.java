@@ -128,6 +128,11 @@ public class player36 implements ContestSubmission
 		// Sort algorithm that sorts the children on fitness from min to max.
 		population.sort(population_size);
 
+		if (use_k_means){
+			Cluster clusters = new Cluster(num_of_clusters);
+			clusters.cluster_convergence(population);
+		}
+
 		// Cluster cluster = new Cluster(num_of_clusters);
 
 
@@ -175,11 +180,16 @@ public class player36 implements ContestSubmission
 			Individual old_best_person = population.getIndividual(population_size - 1);
 
 			// Select who are going to be parents.
-			Population parents = population.tournament_selection(amount_parents, population_size, tournament_size);
+			Population parents = population.tournament_selection(amount_parents, population_size, tournament_size, clusters);
 
 			// Guarantee that the best individual reproduces
 			// parents[parents.length-1] = sorted_survival_chances[sorted_survival_chances.length-1];
 
+			if (use_k_means) {
+				if (mutate_big){
+
+				}
+			}
 			// if (use_k_means) {
 			// 	if (mutate_big) {
 			// 		Random random = new Random();
@@ -219,7 +229,6 @@ public class player36 implements ContestSubmission
 			}
 
 			if (mutate_big) {
-
 				double chance = get_random_double(0, 1);
 				if (chance < 0.5) {
 					new_children = inversion_mutation(new_children);
@@ -397,9 +406,7 @@ public class player36 implements ContestSubmission
 		Population children = new Population(amount_parents);
 
 		for (int i = 0; i < amount_parents; i += 3) {
-			Population temp_children = create_three_children(parents.getIndividual(i),
-																															parents.getIndividual(i + 1),
-																															parents.getIndividual(i + 2));
+			Population temp_children = create_three_children(parents.getIndividual(i), parents.getIndividual(i + 1), parents.getIndividual(i + 2));
 			children.setIndividual(i, temp_children.getIndividual(0));
 			children.setIndividual(i + 1, temp_children.getIndividual(1));
 			children.setIndividual(i + 2, temp_children.getIndividual(2));
