@@ -187,7 +187,7 @@ public class player36 implements ContestSubmission
 
 			if (use_k_means) {
 				if (mutate_big){
-
+					System.out.println("place shit");
 				}
 			}
 			// if (use_k_means) {
