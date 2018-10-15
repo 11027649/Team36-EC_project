@@ -64,7 +64,7 @@ public class player36 implements ContestSubmission
 
 			// Do sth with property values, e.g. specify relevant settings of your algorithm
 	    if (bentCigar) {
-				population_size = 100;
+				population_size = 50;
 				tournament_size = 25;
 				num_of_mutations = 10;
 				num_of_unchanged_best = 0;
@@ -113,6 +113,7 @@ public class player36 implements ContestSubmission
     }
 
 	public void run() {
+<<<<<<< HEAD
 		// Create population, each individual has 10 genes
 		Population population = new Population(population_size);
 
@@ -120,20 +121,72 @@ public class player36 implements ContestSubmission
 		for (int i = 0; i < population_size; i++) {
 			Individual child = population.getIndividual(i);
 			double fitness = (double) evaluation_.evaluate(child.genome);
+=======
+
+		// Create population of 100 ppl, each person has 10 gens
+		double population[][] = create_population(population_size);
+
+		// Determine fitness for each child in population
+		double survival_chances[][] = score_checker(population);
+
+		// sort algorithm that sorts the children on fitness from min to max
+		double sorted_survival_chances[][] = sort_survival_chances(survival_chances);
+
+		// Initialize random individuals that function as the initial cluster means
+		double clusters[][] = create_population(num_of_clusters);
+		cluster_count_array = new int[num_of_clusters];
+		for (int i = 0; i < num_of_clusters; i++){
+			cluster_count_array[i] = 0;
+		}
+
+		if (use_k_means){
+
+			// Arange population to clusters
+			int max_cluster_iterations = 10;
+			int iterations_counter = 0;
+			int correction_counter;
+			do {
+				iterations_counter++;
+				// Create copy of clusters
+				double[][] clusters_clone = new double[num_of_clusters][10];
+				for (int i = 0; i < num_of_clusters; i++){
+					clusters_clone[i] = Arrays.copyOf(clusters[i],clusters[i].length);
+				}
+				// Arange all individuals of population to a certain cluster
+				survival_chances = arange_children_to_clusters(population, survival_chances, clusters);
+				// Rearange clusters by recalculating the mean
+				clusters = rearrange_clusters(population, survival_chances, clusters);
+>>>>>>> a60b35db267692032f48d00d81519faa36b9c010
 
 			child.setFitness(fitness);
 			evals++;
 		}
 
+<<<<<<< HEAD
 		// Sort algorithm that sorts the children on fitness from min to max.
 		population.sort(population_size);
 
 		// TODO: Something with if k-means.........
+=======
+				System.out.println(Arrays.toString(clusters[0]));
+				System.out.println(Arrays.toString(clusters_clone[0]));
+				System.out.println("\n");
+
+				correction_counter = 0;
+				for (int i = 0; i < num_of_clusters; i++){
+					if (Arrays.equals(clusters_clone[i],clusters[i])){
+						correction_counter++;
+					}
+				}
+			} while (iterations_counter < max_cluster_iterations || correction_counter != num_of_clusters);
+		}
+>>>>>>> a60b35db267692032f48d00d81519faa36b9c010
 
 
 		// After initializing: start!
 		while (evals < evaluations_limit_) {
 
+<<<<<<< HEAD
 			Individual old_best_person = population.getIndividual(population_size - 1);
 
 			// Select who are going to be parents.
@@ -173,6 +226,71 @@ public class player36 implements ContestSubmission
 
 
 			Population new_children = new Population(amount_parents);
+=======
+			double old_best_person = sorted_survival_chances[sorted_survival_chances.length -1][0];
+
+			// function input is the list of n random parents. It selects 2 parents from the n input parents.
+			double[][] parents = tournament_parent_selection(amount_parents, tournament_size, sorted_survival_chances);
+			// for (int bob = 0; bob < parents.length; bob++){
+			// 	System.out.println(Arrays.toString(parents[bob]));
+			// }
+			// Guarantee that the best individual reproduces
+			parents[parents.length-1] = sorted_survival_chances[sorted_survival_chances.length-1];
+
+			// if (mutate_big) {
+			// 	int least_used_cluster_index = 0;
+			// 	for (int i = 1; i < num_of_clusters; i++) {
+			// 		if (cluster_count_array[i] < cluster_count_array[least_used_cluster_index]) {
+			// 			least_used_cluster_index = i;
+			// 		}
+			// 	}
+			// 	int best_individual_least_cluster_index = 0;
+			// 	int new_c = 0;
+			// 	for (int s = 0; s < sorted_survival_chances.length; s++) {
+			// 		if ( (int) sorted_survival_chances[s][2] == least_used_cluster_index ){
+			// 			best_individual_least_cluster_index = s;
+			// 			parents[new_c] = sorted_survival_chances[best_individual_least_cluster_index];
+			// 			new_c++;
+			// 			if (new_c > num_parents_from_cluster){
+			// 				new_c = 0;
+			// 			}
+			// 			// break;
+			// 		}
+			// 	}
+			// }
+
+			if (use_k_means) {
+				if (mutate_big) {
+					Random random = new Random();
+					int r = random.nextInt(num_of_clusters);
+					// System.out.println(r);
+					int parents_counter = 0;
+
+					// loop throw all kids
+					for (int i = 0; i < sorted_survival_chances.length; i++){
+
+						// if the child belongs to the clusers we are looking at
+						if ((int) sorted_survival_chances[i][2] == r){
+
+							// place the child in the parents pool
+							parents[parents_counter] = sorted_survival_chances[i];
+							parents_counter++;
+
+							// do this untill the paretns pool is full
+							if (parents_counter == parents.length){
+								break;
+							}
+						}
+					}
+				}
+				for (int i = 0; i < parents.length; i++){
+					cluster_count_array[(int) parents[i][2]]++;
+				}
+			}
+
+
+			double[][] new_children;
+>>>>>>> a60b35db267692032f48d00d81519faa36b9c010
 
 			if (multiple_parents) {
 				new_children = create_children_from_multiple_parents(parents, amount_parents);
@@ -217,8 +335,132 @@ public class player36 implements ContestSubmission
 			}
 
 			// Run for python plot code
+<<<<<<< HEAD
 			print_average_score(population, population_size);
 		}
+=======
+			print_average_score(sorted_survival_chances);
+		}
+
+		// System.out.println("SWAG");
+		// int least_used_cluster_index = 0;
+		// System.out.println(cluster_count_array[0]);
+		// for(int i = 1; i < num_of_clusters; i++) {
+		// 	System.out.println(cluster_count_array[i]);
+		// 	if (cluster_count_array[i] < cluster_count_array[least_used_cluster_index]) {
+		// 		least_used_cluster_index = i;
+		// 	}
+		// }
+		// System.out.println(least_used_cluster_index);
+		// survival_chances = arange_children_to_clusters(population, survival_chances, clusters);
+		// for (int i = 0; i < survival_chances.length; i++) {
+		// 	System.out.println(Arrays.toString(sorted_survival_chances[i]));
+		// clusters = rearrange_clusters(population, survival_chances, clusters);
+
+		// for (int i = 0; i < clusters.length; i++) {
+		// 	System.out.print(i);
+		// 	System.out.println(Arrays.toString(clusters[i]));
+
+		// Print for usability
+		// for (int c2 = 0; c2 < clusters.length; c2++){
+		// 	for (int c = 0; c < population.length; c++){
+		// 		if ((int) sorted_survival_chances[c][2] == c2){
+		// 			System.out.println(Arrays.toString(sorted_survival_chances[c]));
+		// 		}
+		// 	}
+		// }
+
+
+	}
+
+
+
+	// Part 1 of the k-means clustering
+	// The children are assigned to a cluster
+	public double[][] arange_children_to_clusters(double[][] children, double[][] survival_chances, double[][] clusters) {
+
+		// loop throw all kids
+		for (int i = 0; i < children.length; i++) {
+
+			// search the index number
+			int child_index = (int) survival_chances[i][1];
+
+			// find the corresponding genes
+			double[] child = children[child_index];
+
+
+			double childs_min = 1000;
+			int cluster_num = -1;
+
+			// determine in wich cluster the child fitst the best
+			for (int j = 0; j < clusters.length; j++) {
+
+				double[] cluster = clusters[j];
+
+				double dist = 0.0;
+
+				// compare 1 gene of the kid with 10 genes from the cluster... @ Tobais, I think this is wrong
+				for (int k = 0; k < child.length; k++){
+
+					// take the square distance
+					dist = dist + (child[k] - cluster[k]) * (child[k] - cluster[k]);
+				}
+
+				dist = Math.sqrt(dist);
+
+				if (dist < childs_min) {
+					childs_min = dist;
+					cluster_num = j;
+				}
+			}
+			survival_chances[i][2] = cluster_num;
+		}
+		return survival_chances;
+	}
+
+	// Part 2 of the k-means clustering
+	// The clusters means are updated
+	public double[][] rearrange_clusters(double[][] children, double[][] survival_chances, double[][] clusters) {
+
+		double[] cluster_tot = new double[10];
+		double kids_in_cluster;
+
+		// for 5 clusters
+		for (int i = 0; i < clusters.length; i++) {
+
+			// Place zeros in cluster total for calculating mean
+			for (int j = 0; j < cluster_tot.length; j++){
+				cluster_tot[j] = 0;
+			}
+
+			kids_in_cluster = 0;
+
+			// loop throw all kids and place them in the right cluster
+			for (int k = 0; k < survival_chances.length; k++){
+
+				// take the row from surv. changes
+				double[] row = survival_chances[k];
+
+				// take the cluster number
+				int clust_num = (int) row[2];
+
+				// if the child you are looking at is cluster i
+				if (clust_num == i) {
+
+					int index = (int) row[1];
+
+					// add to the cluster with the genes from the child you are looking at
+					for (int l = 0; l < cluster_tot.length; l++){
+						cluster_tot[l] = cluster_tot[l] + children[index][l];
+					}
+					// cluster_tot = cluster_tot + children[index];
+					kids_in_cluster = kids_in_cluster + 1;
+				}
+			}
+
+			if (kids_in_cluster > 0.0 ) {
+				// System.out.println		kids_in_cluster);
+>>>>>>> a60b35db267692032f48d00d81519faa36b9c010
 
 		// System.out.println("SWAG");
 		// int least_used_cluster_index = 0;
@@ -249,7 +491,14 @@ public class player36 implements ContestSubmission
 
 	}
 
+<<<<<<< HEAD
 	public Population create_children_from_multiple_parents(Population parents, int amount_parents) {
+=======
+		// System.out.println("Koeeeee");
+		for (int koe = 0; koe < parents.length; koe ++){
+			System.out.println(Arrays.toString(parents[koe]));
+		}
+>>>>>>> a60b35db267692032f48d00d81519faa36b9c010
 
 		Population children = new Population(amount_parents);
 
@@ -303,6 +552,11 @@ public class player36 implements ContestSubmission
 		for (int i = 0; i < new_children.length; i++) {
 			// Get index of those to replace
 			Double fitness = (double) evaluation_.evaluate(new_children[i]);
+
+
+			System.out.println("Gezeik");
+			System.out.println(fitness);
+
 			evals++;
 			survival_chances[i][0] = fitness;
 
