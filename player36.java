@@ -72,7 +72,7 @@ public class player36 implements ContestSubmission
 				num_of_clusters = 20;
 				num_parents_from_cluster = 1;
 				mutate_big = false;
-				use_k_means = false;
+				use_k_means = true;
 
 				// 3 parents (more efficient evolution?)
 				multiple_parents = true;
@@ -128,8 +128,9 @@ public class player36 implements ContestSubmission
 		// Sort algorithm that sorts the children on fitness from min to max.
 		population.sort(population_size);
 
+
+		Cluster clusters = new Cluster(num_of_clusters);
 		if (use_k_means){
-			Cluster clusters = new Cluster(num_of_clusters);
 			clusters.cluster_convergence(population);
 		}
 
@@ -184,40 +185,29 @@ public class player36 implements ContestSubmission
 
 			// Guarantee that the best individual reproduces
 			// parents[parents.length-1] = sorted_survival_chances[sorted_survival_chances.length-1];
-
+			System.out.println(parents.pop_size);
+			parents.getIndividual(0).getCluster();
 			if (use_k_means) {
-				if (mutate_big){
-					System.out.println("place shit");
+				if (mutate_big) {
+					Random random = new Random();
+					int r = random.nextInt(num_of_clusters-1)+1;
+					System.out.println("randomised");
+					System.out.println(r);
+					int parents_counter = 0;
+					for (int i = 0; i < population.pop_size; i++) {
+						if(population.getIndividual(i).getCluster() == r){
+							System.out.println(parents.pop_size);
+							parents.setIndividual(parents_counter, population.getIndividual(i));
+							parents_counter++;
+							if(parents_counter > parents.pop_size){
+								parents_counter = 0;
+							}
+						}
+					}
+					// Increase cluster counts with a punishment to speed up the neighbourhood exploration proces.
+					clusters.cluster_count_array[r] = clusters.cluster_count_array[r] + 2*parents.pop_size;
 				}
 			}
-			// if (use_k_means) {
-			// 	if (mutate_big) {
-			// 		Random random = new Random();
-			// 		int r = random.nextInt(num_of_clusters);
-			// 		// System.out.println(r);
-			// 		int parents_counter = 0;
-			//
-			// 		// loop throw all kids
-			// 		for (int i = 0; i < sorted_survival_chances.length; i++){
-			//
-			// 			// if the child belongs to the clusers we are looking at
-			// 			if ((int) sorted_survival_chances[i][2] == r){
-			//
-			// 				// place the child in the parents pool
-			// 				parents[parents_counter] = sorted_survival_chances[i];
-			// 				parents_counter++;
-			//
-			// 				// do this untill the paretns pool is full
-			// 				if (parents_counter == parents.length){
-			// 					break;
-			// 				}
-			// 			}
-			// 		}
-			// 	}
-			// 	for (int i = 0; i < parents.length; i++){
-			// 		cluster_count_array[(int) parents[i][2]]++;
-			// 	}
-			// }
 
 
 			Population new_children = new Population(amount_parents);

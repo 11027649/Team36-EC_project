@@ -63,6 +63,7 @@ public class Population {
 
         parents_pool.sort(tournament_size);
         // Select best parent from the pool.
+        clusters.cluster_count_array[parents_pool.getIndividual(tournament_size - 1).getCluster()]++;
         parents.setIndividual(i, parents_pool.getIndividual(tournament_size - 1));
     }
 

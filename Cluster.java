@@ -1,10 +1,17 @@
+import java.util.Random;
+import java.util.Properties;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
+import java.util.HashSet;
+import java.util.Set;
+
+import java.lang.Math;
 
 public class Cluster {
 
-   List<Individual> clusters = new ArrayList<Individual>();
+   ArrayList<Individual> clusters = new ArrayList<Individual>();
    // ArrayList<Individual> clusters = new ArrayList<Individual>();
    int amount_of_clusters = 0;
    int[] cluster_count_array;
@@ -46,7 +53,7 @@ public class Cluster {
 
  						// Create copy of clusters
             // NOTE: Not entirally sure if this works.
-            List<Individual> clusters_clone = new ArrayList<Individual>(amount_of_clusters);
+            ArrayList<Individual> clusters_clone = new ArrayList<Individual>();
             // ArrayList<Individual> clusters_clone = new ArrayList<Individual>(amount_of_clusters);
  						
        //      for (Individual c : clusters ){
@@ -61,7 +68,9 @@ public class Cluster {
              for(int j = 0; j < 10; j++) {
               cloned_cluster.genome[j] = temporary_cluster.genome[j];
              }
-             clusters_clone.set(i,cloned_cluster);
+             // System.out.println(amount_of_clusters);
+             // System.out.println(clusters_clone.size());
+             clusters_clone.add(cloned_cluster);
              // Arrays.copyOf(clusters[i],clusters[i].length);
             
             }
@@ -74,11 +83,15 @@ public class Cluster {
 
  						correction_counter = 0;
  						for (int i = 0; i < amount_of_clusters; i++){
- 							if (clusters_clone.get(i) == clusters.get(i)) {
- 								correction_counter++;
- 							}
+             for (int k = 0; k < clusters.get(i).genome.length; k++){
+              if (clusters.get(i).genome[k] == clusters_clone.get(i).genome[k]) {
+                correction_counter++;
+              }
+              
+             }
  						}
- 					} while (iterations_counter < max_cluster_iterations || correction_counter != amount_of_clusters);
+          // } while (iterations_counter < max_cluster_iterations || correction_counter != 10*amount_of_clusters);
+          } while (correction_counter != 10*amount_of_clusters && iterations_counter < max_cluster_iterations);
    }
 
   // arrange clusters
