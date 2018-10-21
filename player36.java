@@ -64,7 +64,7 @@ public class player36 implements ContestSubmission
 
 			// Do sth with property values, e.g. specify relevant settings of your algorithm
 	    if (bentCigar) {
-				population_size = 100;
+				population_size = 500;
 				tournament_size = 25;
 				num_of_mutations = 10;
 				num_of_unchanged_best = 0;
@@ -75,10 +75,10 @@ public class player36 implements ContestSubmission
 				use_k_means = true;
 
 				// 3 parents (more efficient evolution?)
-				multiple_parents = true;
+				multiple_parents = false;
 
 				// if multiple parents = true, the amount of parents must be in the table of 3, else, it must be even
-				amount_parents = 9;
+				amount_parents = 10;
 			}
 			else if (schaffers) {
 				population_size = 100;
