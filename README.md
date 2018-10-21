@@ -1,6 +1,6 @@
 # Team36-EC_project 21-10-2018
-## Bob Borsboom, Tobias Garritsen, Emma Hokken, Natasja Wezel
-## Implemented for the Evolutionary Computing course at the Free University (VU) Amsterdam
+#### Bob Borsboom, Tobias Garritsen, Emma Hokken, Natasja Wezel
+#### Implemented for the Evolutionary Computing course at the Free University (VU) Amsterdam
 Designing and implementing an EA to maximise three continuous optimisation problems (Bent Cigar, Katsuura, and Schaffers F7 function) in 10 dimensions with a limited computational budget.
 
 ## Summary
